@@ -5,11 +5,11 @@ const int ledPin = 32;
 /*PWM制御--------------------------------------------------------------------------*/
 
 
-/*BME280　室内温・気圧-------------------------------------------------------------*/
+/*BME280　室内温・気圧--------------------------------------------------------------*/
 #include "ESP32_BME280_I2C.h"
 ESP32_BME280_I2C bme280i2c(0x76, 16, 17, 400000); //address, SCK, SDA, frequency
 char temp_c[10], hum_c[10], pres_c[10];
-/*BME280　室内温・気圧-------------------------------------------------------------*/
+/*BME280　室内温・気圧--------------------------------------------------------------*/
 
 
 /*TFT_eSPI-------------------------------------------------------------------------*/
@@ -40,7 +40,7 @@ NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PIXEL_COUNT, PIXEL_PIN);
 #define ONE_WIRE_BUS 19
 // Setup a oneWire instance to communicate with a OneWire device
 OneWire oneWire(ONE_WIRE_BUS);
-// Pass our oneWire reference to Dallas Temperature sensor 
+// Pass our oneWire reference to Dallas Temperature sensor
 DallasTemperature sensors(&oneWire);
 
 DeviceAddress sensor1 = { 0x28, 0xAA, 0xDE, 0x9, 0x38, 0x14, 0x1, 0x90 };
@@ -71,14 +71,14 @@ void setup() {
   // put your setup code here, to run once:
   ledcSetup(0, 60, 8);
   ledcAttachPin(ledPin, 0);
-  
+
 
   /*TFT_eSPI*/
   tft.begin();
   tft.setRotation(1);
   tft.fillScreen(TFT_BLACK);
 
-  
+
   /*BME280*/
   delay(1000); //Take some time to open up the Serial Monitor
   uint8_t t_sb = 0; //stanby 0.5ms
@@ -93,7 +93,7 @@ void setup() {
   //DS18B20(1-Wire)
 
 
-  
+
   //delay(1000);
 
 
@@ -110,28 +110,28 @@ void loop() {
   yield();
   tft.setTextColor(TFT_RED, TFT_BLACK);
   xpos = 10;
-  xpos += tft.drawString("PWM = ", xpos, 10, 4); 
+  xpos += tft.drawString("PWM = ", xpos, 10, 4);
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.drawNumber(brightness, xpos, 10, 4);
 
   tft.setTextColor(TFT_RED, TFT_BLACK);
   xpos = 10;
-  xpos += tft.drawString("Temperature = ", xpos, 40, 4); 
+  xpos += tft.drawString("Temperature = ", xpos, 40, 4);
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.drawString(temp_c, xpos, 40, 4);
 
   tft.setTextColor(TFT_RED, TFT_BLACK);
   xpos = 10;
-  xpos += tft.drawString("Humidity = ", xpos, 80, 4); 
+  xpos += tft.drawString("Humidity = ", xpos, 80, 4);
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.drawString(hum_c, xpos, 80, 4);
 
   tft.setTextColor(TFT_RED, TFT_BLACK);
   xpos = 10;
-  xpos += tft.drawString("Pressure =  ", xpos, 120, 4); 
+  xpos += tft.drawString("Pressure =  ", xpos, 120, 4);
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.drawString(pres_c, xpos, 120, 4);
-  
+
 
   /*PWM*/
   ledcWrite(0, brightness);
@@ -141,10 +141,10 @@ void loop() {
   } else if (brightness == 255) {
     diff = -5;
   }
- 
+
   brightness += diff;
-  
-  
+
+
 
   /*BME280*/
   bme_get();
@@ -184,18 +184,18 @@ void loop() {
   //Serial.print("Requesting temperatures...");
   sensors.requestTemperatures(); // Send the command to get temperatures
   //Serial.println("DONE");
-  
+
   Serial.print("Sensor 1(*C): ");
-  Serial.println(sensors.getTempC(sensor1)); 
- 
+  Serial.println(sensors.getTempC(sensor1));
+
   Serial.print("Sensor 2(*C): ");
-  Serial.println(sensors.getTempC(sensor2)); 
-  
+  Serial.println(sensors.getTempC(sensor2));
+
   Serial.print("Sensor 3(*C): ");
-  Serial.println(sensors.getTempC(sensor3)); 
+  Serial.println(sensors.getTempC(sensor3));
 
   Serial.print("Sensor 4(*C): ");
-  Serial.println(sensors.getTempC(sensor4)); 
+  Serial.println(sensors.getTempC(sensor4));
 
 
  //Serial.println("Hello World!"); Serial.print("PWM = "); Serial.println(brightness);
@@ -207,15 +207,15 @@ void loop() {
 
 
 /************** BME280 測定 *************************/
-void bme_get(){ 
+void bme_get(){
   byte temperature = (byte)round(bme280i2c.Read_Temperature());
   byte humidity = (byte)round(bme280i2c.Read_Humidity());
   uint16_t pressure = (uint16_t)round(bme280i2c.Read_Pressure());
- 
+
   sprintf(temp_c, "%2d ℃", temperature);
   sprintf(hum_c, "%2d ％", humidity);
   sprintf(pres_c, "%4d hPa", pressure);
- 
+
   Serial.println("-----------------------");
   Serial.print("Temperature = "); Serial.println(temp_c);
   Serial.print("Humidity = "); Serial.println(hum_c);
@@ -223,4 +223,3 @@ void bme_get(){
   Serial.println("-----------------------");
   Serial.flush();
 }
-
