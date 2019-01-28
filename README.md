@@ -9,7 +9,7 @@
 　https://www.amazon.co.jp/gp/product/B077XGK9MY/  
 ・参考サイト  
 　https://macsbug.wordpress.com/2017/08/12/how-to-use-a-tft-display-for-raspberry-pie-with-esp32/  
-
+  
 
 //BME280　室内温・気圧  
 ・BME280搭載　温湿度・気圧センサモジュール  
@@ -37,4 +37,3 @@
 
 ・参考サイト  
 　https://garretlab.web.fc2.com/arduino/esp32/lab/ledc/index.html  
-  
