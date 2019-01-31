@@ -66,22 +66,22 @@
       <td align="center" bgcolor="#000000"></td>
     </tr>
     <tr>
-      <td align="center"></td>
+      <td align="center">TFT_eSPI</td>
       <td align="center">RST</td>
       <td align="center">23</td>
-      <td align="center"></td>
+      <td align="center">TFT_eSPI</td>
     </tr>
     <tr>
       <td align="center"></td>
       <td align="center">36</td>
       <td align="center">22</td>
-      <td align="center"></td>
+      <td align="center">NeoPixel</td>
     </tr>
     <tr>
       <td align="center"></td>
       <td align="center">39</td>
       <td align="center">1</td>
-      <td align="center"></td>
+      <td align="center">NeoPixel</td>
     </tr>
     <tr>
       <td align="center"></td>
@@ -96,7 +96,7 @@
       <td align="center"></td>
     </tr>
     <tr>
-      <td align="center"></td>
+      <td align="center">PWM制御</td>
       <td align="center">32</td>
       <td align="center" bgcolor="#000000"><font COLOR="#ffffff"><b>GND</b></font></td>
       <td align="center" bgcolor="#000000"></td>
@@ -105,31 +105,31 @@
       <td align="center"></td>
       <td align="center">33</td>
       <td align="center">19</td>
-      <td align="center"></td>
+      <td align="center">DS18B20</td>
     </tr>
     <tr>
       <td align="center"></td>
       <td align="center">25</td>
       <td align="center">18</td>
-      <td align="center"></td>
+      <td align="center">TFT_eSPI</td>
     </tr>
     <tr>
       <td align="center"></td>
       <td align="center">26</td>
       <td align="center">5</td>
-      <td align="center"></td>
+      <td align="center">TFT_eSPI</td>
     </tr>
     <tr>
       <td align="center"></td>
       <td align="center">27</td>
       <td align="center">17</td>
-      <td align="center"></td>
+      <td align="center">BME280</td>
     </tr>
     <tr>
       <td align="center"></td>
       <td align="center">14</td>
       <td align="center">16</td>
-      <td align="center"></td>
+      <td align="center">BME280</td>
     </tr>
     <tr>
       <td align="center"></td>
@@ -144,7 +144,7 @@
       <td align="center"></td>
     </tr>
     <tr>
-      <td align="center"></td>
+      <td align="center">TFT_eSPI</td>
       <td align="center">13</td>
       <td align="center">2</td>
       <td align="center"></td>

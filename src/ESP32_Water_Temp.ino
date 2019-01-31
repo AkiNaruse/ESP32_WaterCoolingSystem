@@ -20,14 +20,15 @@ TFT_eSPI tft = TFT_eSPI();       // Invoke custom library
 
 
 /*NeoPixel-------------------------------------------------------------------------*/
-//#include <Adafruit_NeoPixel.h>
+#include <Adafruit_NeoPixel.h>
 #include <NeoPixelBus.h>
 //#include <EmotionalBlink.h>
-//#define PIN 22 // LEDへの信号線をD8に繋ぐ
-//#define NUMLED 8 // LEDの個数は1。数珠つなぎに複数個のLEDをつなげることも可能
+#define PIN 21 // LEDへの信号線をD8に繋ぐ
+#define NUMPIXELS 2 // LEDの個数は1。数珠つなぎに複数個のLEDをつなげることも可能
 #define PIXEL_PIN 22
 #define PIXEL_COUNT 3
-//Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMLED, PIN, NEO_RGB + NEO_KHZ800); //おまじない
+
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800); //おまじない
 NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PIXEL_COUNT, PIXEL_PIN);
 /*NeoPixel-------------------------------------------------------------------------*/
 
@@ -62,8 +63,11 @@ void setup() {
 
  /*NeoPixel----------------------------------*/
   // NeoPixelのLEDの初期化
-  //pixels.begin();
+  pixels.begin();
+  pixels.show();
+  // this resets all the neopixels to an off state
   strip.Begin();
+  strip.Show();
 
 
  /*PWM制御*/
@@ -149,36 +153,27 @@ void loop() {
   /*BME280*/
   bme_get();
 
-  /*NeoPixel
+
+  //NeoPixel
   // 2秒かけて、消灯→点灯(赤)→消灯をじんわりやる
-  Blink.softly(&pixels, NUMLED, 0, 0, 55, 2000); //GRB
+  //Blink.softly(&pixels, NUMLED, 0, 0, 55, 2000); //GRB
   // 1秒間パリピ点滅をする
   //Blink.likePartyPeople(&pixels, NUMLED, 1000);
-  */
-   for(int i=0;i<PIXEL_COUNT;i++){
-
+  for(int i=0;i<PIXEL_COUNT;i++){
     // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
     strip.SetPixelColor(i,RgbColor(0,0,10)); // Moderately bright green color.
-
-    strip.Show(); // This sends the updated pixel color to the hardware.
-
     //delay(delayval); // Delay for a period of time (in milliseconds).
+  }
+  strip.Show(); // This sends the updated pixel color to the hardware.
 
-   }
 
-  /*
-  strip.SetPixelColor(0,RgbColor(0,0,10));
-  strip.SetPixelColor(1,RgbColor(0,0,10));
-  strip.SetPixelColor(2,RgbColor(0,0,10));
-  strip.SetPixelColor(3,RgbColor(0,0,10));
-  strip.SetPixelColor(4,RgbColor(0,0,10));
-  strip.SetPixelColor(5,RgbColor(0,0,10));
-  strip.SetPixelColor(6,RgbColor(0,0,10));
-  strip.SetPixelColor(7,RgbColor(0,0,10));
-  //6.LEDセルを更新するための関数っぽい。
-  //pixels.show();
-  strip.Show();
- */
+
+  for(int i=0;i<NUMPIXELS;i++){
+      // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
+      pixels.setPixelColor(i, pixels.Color(10,0,0)); // Moderately bright green color.
+      pixels.show(); // This sends the updated pixel color to the hardware.
+  }
+
 
   //DS18B20(1-Wire)
   //Serial.print("Requesting temperatures...");
