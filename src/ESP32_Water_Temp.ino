@@ -20,16 +20,18 @@ TFT_eSPI tft = TFT_eSPI();       // Invoke custom library
 
 
 /*NeoPixel-------------------------------------------------------------------------*/
-#include <Adafruit_NeoPixel.h>
 #include <NeoPixelBus.h>
-//#include <EmotionalBlink.h>
-#define PIN 21 // LEDへの信号線をD8に繋ぐ
-#define NUMPIXELS 2 // LEDの個数は1。数珠つなぎに複数個のLEDをつなげることも可能
 #define PIXEL_PIN 22
-#define PIXEL_COUNT 3
-
-Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800); //おまじない
+#define PIXEL_COUNT 5
 NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PIXEL_COUNT, PIXEL_PIN);
+
+#include <FastLED.h>
+const int DATA_PIN = 21;
+const int NUM_LEDS = 5;
+CRGB leds[NUM_LEDS];
+
+int RR=0,GG=0,BB=0,RRGGBB=0;
+
 /*NeoPixel-------------------------------------------------------------------------*/
 
 
@@ -52,38 +54,39 @@ DeviceAddress sensor5 = { 0x28, 0xFF, 0x36, 0x46, 0x69, 0x14, 0x4, 0x24 };
 /*DS18B20(1-Wire)------------------------------------------------------------------*/
 
 
-int NN=0;
 
 
 void setup() {
 
- /*シリアル初期化----------------------------*/
+ /*シリアル初期化-----------------------------*/
   Serial.begin(115200);
 
 
  /*NeoPixel----------------------------------*/
-  // NeoPixelのLEDの初期化
-  pixels.begin();
-  pixels.show();
-  // this resets all the neopixels to an off state
+  //NeoPixelBusのLEDの初期化
   strip.Begin();
   strip.Show();
 
+  // FastLEDの設定
+  FastLED.addLeds<WS2811, DATA_PIN, RGB>(leds, NUM_LEDS);
+  //FastLED.setBrightness(64);
+  //set_max_power_in_volts_and_milliamps(5, 100);
 
- /*PWM制御*/
+
+ /*PWM制御-----------------------------------*/
   // PWM制御の初期化
   // put your setup code here, to run once:
   ledcSetup(0, 60, 8);
   ledcAttachPin(ledPin, 0);
 
 
-  /*TFT_eSPI*/
+  /*TFT_eSPI---------------------------------*/
   tft.begin();
   tft.setRotation(1);
   tft.fillScreen(TFT_BLACK);
 
 
-  /*BME280*/
+  /*BME280-----------------------------------*/
   delay(1000); //Take some time to open up the Serial Monitor
   uint8_t t_sb = 0; //stanby 0.5ms
   uint8_t filter = 4; //IIR filter = 16
@@ -95,12 +98,7 @@ void setup() {
 
 
   //DS18B20(1-Wire)
-
-
-
   //delay(1000);
-
-
 
 }
 
@@ -137,7 +135,7 @@ void loop() {
   tft.drawString(pres_c, xpos, 120, 4);
 
 
-  /*PWM*/
+  /*PWM制御*/
   ledcWrite(0, brightness);
 
   if (brightness == 0) {
@@ -155,23 +153,30 @@ void loop() {
 
 
   //NeoPixel
-  // 2秒かけて、消灯→点灯(赤)→消灯をじんわりやる
-  //Blink.softly(&pixels, NUMLED, 0, 0, 55, 2000); //GRB
-  // 1秒間パリピ点滅をする
-  //Blink.likePartyPeople(&pixels, NUMLED, 1000);
+  //NeoPixelBus
   for(int i=0;i<PIXEL_COUNT;i++){
     // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
-    strip.SetPixelColor(i,RgbColor(0,0,10)); // Moderately bright green color.
+    strip.SetPixelColor(i,RgbColor(RR,GG,BB)); // Moderately bright green color.
     //delay(delayval); // Delay for a period of time (in milliseconds).
+    strip.Show(); // This sends the updated pixel color to the hardware.
   }
-  strip.Show(); // This sends the updated pixel color to the hardware.
+
+  //FastLED
+  for (int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = CRGB( GG, RR, BB);
+  }
+  FastLED.show();
 
 
-
-  for(int i=0;i<NUMPIXELS;i++){
-      // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
-      pixels.setPixelColor(i, pixels.Color(10,0,0)); // Moderately bright green color.
-      pixels.show(); // This sends the updated pixel color to the hardware.
+  if(RRGGBB == 0){
+    RR=5;GG=0;BB=0;
+    RRGGBB++;
+  }else if (RRGGBB == 1) {
+    RR=0;GG=5;BB=0;
+    RRGGBB++;
+  }else if (RRGGBB >= 2) {
+    RR=0;GG=0;BB=5;
+    RRGGBB=0;
   }
 
 
@@ -195,7 +200,7 @@ void loop() {
 
  //Serial.println("Hello World!"); Serial.print("PWM = "); Serial.println(brightness);
  //Serial.println(NN);
-
+  Serial.println(RRGGBB);
 
  delay(1000);
 }

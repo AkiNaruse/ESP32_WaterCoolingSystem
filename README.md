@@ -8,7 +8,7 @@
 
 -   WINGONEER 3.5インチTFTタッチスクリーン、320x480解像度LCDディスプレイラズベリーパイ用  
       <https://www.amazon.co.jp/gp/product/B077XGK9MY/>  
--   参考サイト  
+ -   参考サイト  
       <https://macsbug.wordpress.com/2017/08/12/how-to-use-a-tft-display-for-raspberry-pie-with-esp32/>  
 
 * * *
@@ -17,7 +17,7 @@
 
 -   BME280搭載　温湿度・気圧センサモジュール  
       <https://www.switch-science.com/catalog/2236/>  
--   参考サイト  
+ -   参考サイト  
       <https://www.mgo-tec.com/blog-entry-esp32-bme280-sensor-library.html>  
 
 * * *
@@ -26,7 +26,7 @@
 
 -   DS18B20(Techcell)  
       <https://www.amazon.co.jp/gp/product/B07M886SBK/>  
--   参考サイト  
+ -   参考サイト  
       <https://randomnerdtutorials.com/esp32-with-multiple-ds18b20-temperature-sensors/>  
 
 * * *
@@ -34,19 +34,20 @@
 ### //NeoPixel
 
 -   ALITOVE WS2812B LEDテープ1m 144連 NeoPixel RGB TAPE LED 5050 SMD LEDテープライトピクセル 防水 黒いベース 5V DC  
--   NeoPixel スルーホールLED(半透明 5mm 5個入りパック)  
-
--   参考サイト  
+ -   参考サイト  
       <http://ogimotokin.hatenablog.com/entry/2018/12/25/005300>  
+
+-   NeoPixel スルーホールLED(半透明 5mm 5個入りパック)  
+ -   参考サイト  
+      <http://cammy.co.jp/technical/2016/01/23/arduino-007/>  
 
 * * *
 
 ### //PWM制御
 
--   
+-  
 
-
--   参考サイト  
+ -   参考サイト  
       <https://garretlab.web.fc2.com/arduino/esp32/lab/ledc/index.html>  
 
 * * *
@@ -75,13 +76,13 @@
       <td align="center"></td>
       <td align="center">36</td>
       <td align="center">22</td>
-      <td align="center">NeoPixel</td>
+      <td align="center">NeoPixel-144連</td>
     </tr>
     <tr>
       <td align="center"></td>
       <td align="center">39</td>
       <td align="center">1</td>
-      <td align="center">NeoPixel</td>
+      <td align="center"></td>
     </tr>
     <tr>
       <td align="center"></td>
@@ -93,7 +94,7 @@
       <td align="center"></td>
       <td align="center">35</td>
       <td align="center">21</td>
-      <td align="center"></td>
+      <td align="center">NeoPixel-6連</td>
     </tr>
     <tr>
       <td align="center">PWM制御</td>
