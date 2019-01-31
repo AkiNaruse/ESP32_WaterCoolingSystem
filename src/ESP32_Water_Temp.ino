@@ -167,7 +167,7 @@ void loop() {
   }
   FastLED.show();
 
-
+  //
   if(RRGGBB == 0){
     RR=5;GG=0;BB=0;
     RRGGBB++;
