@@ -22,7 +22,7 @@
 
 * * *
 
-### //DS18B20(1-Wire)
+### //DS18B20(1-Wire)　外気温・水温
 
 -   DS18B20(Techcell)  
       <https://www.amazon.co.jp/gp/product/B07M886SBK/>  
@@ -34,21 +34,42 @@
 ### //NeoPixel
 
 -   ALITOVE WS2812B LEDテープ1m 144連 NeoPixel RGB TAPE LED 5050 SMD LEDテープライトピクセル 防水 黒いベース 5V DC  
+    https://www.amazon.co.jp/gp/product/B01MYT6JH9/
  -   参考サイト  
       <http://ogimotokin.hatenablog.com/entry/2018/12/25/005300>  
 
 -   NeoPixel スルーホールLED(半透明 5mm 5個入りパック)  
+    https://www.switch-science.com/catalog/1863/
  -   参考サイト  
       <http://cammy.co.jp/technical/2016/01/23/arduino-007/>  
 
 * * *
 
-### //PWM制御
+### //ラジエータファンPWM制御
 
--  
+-  PC用ファンの制御
 
  -   参考サイト  
       <https://garretlab.web.fc2.com/arduino/esp32/lab/ledc/index.html>  
+
+* * *
+### //水流量センサ
+
+-  SEN0217 - WaterFlowSensor 水流量センサ
+   http://akizukidenshi.com/catalog/g/gM-12548/
+
+ -   参考サイト  
+     http://www.eleki-jack.com/sengokufan/2011/12/seeed-studio2.html  
+     (インターネットアーカイブは神)
+
+* * *
+### //FAN-LED制御
+
+-  Riing 12 LED RGB 256  
+   https://www.thermaltake.com/products-model.aspx?id=C_00002731&o=1  
+
+  -   参考サイト  
+      制御法思考中...
 
 * * *
 
