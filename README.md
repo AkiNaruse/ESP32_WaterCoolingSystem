@@ -72,7 +72,24 @@
       制御法思考中...
 
 * * *
+### //PHP
 
+-  値を取得してPHPへ送信
+  -   参考サイト  
+      http://projectsbiotope.blogspot.com/2010/02/arduinoweb.html
+
+* * *
+### //WiFiClient & NTP
+
+-  NTPで現在時間を取得
+  -   参考サイト  
+      http://www.autumn-color.com/archives/839
+-  NTPで現在時間を取得
+  -   参考サイト  
+      http://projectsbiotope.blogspot.com/2010/02/arduinoweb.html
+  -   参考サイト  
+      http://www.shangtian.tokyo/entry/2017/06/19/232014
+* * *
 ### //使用中のピン
 
 <table>

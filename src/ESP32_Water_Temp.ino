@@ -54,12 +54,48 @@ DeviceAddress sensor5 = { 0x28, 0xFF, 0x36, 0x46, 0x69, 0x14, 0x4, 0x24 };
 /*DS18B20(1-Wire)------------------------------------------------------------------*/
 
 
+/*WiFi-----------------------------------------------------------------------------*/
+#include <WiFi.h>
+#include <WiFiClient.h>
+
+
+const char *ssid = "";
+const char *password = "";
+const char* server = "";
+
+WiFiClient client;
+//関数の宣言
+void connectServer(float,float,float,float,float,float,float,float);
+
+float temp0=20,temp1=20,temp2=20,temp3=20,temp4=20,Humi=50,APress=998,Flow=300;
+/*WiFi-----------------------------------------------------------------------------*/
+
+
+/*NTP------------------------------------------------------------------------------*/
+#include <time.h>
+#define JST     3600* 9
+/*NTP-----------------------------------------------------------------------------*/
 
 
 void setup() {
 
  /*シリアル初期化-----------------------------*/
   Serial.begin(115200);
+
+/*WiFi---------------------------------------*/
+  Serial.print("\n\nStart\n");
+
+  WiFi.begin(ssid, password);
+  while(WiFi.status() != WL_CONNECTED) {
+    Serial.print('.');
+    delay(500);
+  }
+  Serial.println();
+  Serial.printf("Connected, IP address: ");
+  Serial.println(WiFi.localIP());
+
+/*NTP----------------------------------------*/
+  configTime( JST, 0, "ntp.nict.jp", "ntp.jst.mfeed.ad.jp");
 
 
  /*NeoPixel----------------------------------*/
@@ -104,6 +140,20 @@ void setup() {
 
 
 void loop() {
+
+  /*NTP*/
+  time_t t;
+  struct tm *tm;
+  static const char *wd[7] = {"Sun","Mon","Tue","Wed","Thr","Fri","Sat"};
+
+  t = time(NULL);
+  tm = localtime(&t);
+  Serial.printf(" %04d/%02d/%02d(%s) %02d:%02d:%02d\n",
+        tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday,
+        wd[tm->tm_wday],
+        tm->tm_hour, tm->tm_min, tm->tm_sec);
+
+
 
   /*TFT_eSPI*/
   int xpos;
@@ -202,6 +252,10 @@ void loop() {
  //Serial.println(NN);
   Serial.println(RRGGBB);
 
+  //PHPへ送信
+  //関数に値を代入して実行
+  connectServer(temp0,temp1,temp2,temp3,temp4,Humi,APress,Flow);
+
  delay(1000);
 }
 
@@ -222,4 +276,35 @@ void bme_get(){
   Serial.print("Pressure = "); Serial.println(pres_c);
   Serial.println("-----------------------");
   Serial.flush();
+}
+
+
+/************** PHPへ送信 *************************/
+//サーバーに接続し値を送る
+void connectServer(float t0, float t1,float t2, float t3,float t4, float h,float p, float f) {
+  if(client.connect(server, 80)){
+    Serial.println("connected to server");
+    // 指定のwebサーバのPHPスクリプトにGET送信
+    client.print("GET /monitor/receive.php?temp0=");
+    client.print(t0);
+    client.print("&temp1=");
+    client.print(t1);
+    client.print("&temp2=");
+    client.print(t2);
+    client.print("&temp3=");
+    client.print(t3);
+    client.print("&temp4=");
+    client.print(t4);
+    client.print("&Humi=");
+    client.print(h);
+    client.print("&APress=");
+    client.print(p);
+    client.print("&Flow=");
+    client.print(f);
+    client.print(" HTTP/1.1\r\n");
+    client.print("HOST: ");
+    client.println(server);
+    client.println("Connection: close");
+    client.println();
+  }
 }
