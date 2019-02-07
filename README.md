@@ -81,14 +81,14 @@
 * * *
 ### //WiFiClient & NTP
 
--  NTPで現在時間を取得
+-  NTPで現在時間を取得  
   -   参考サイト  
-      http://www.autumn-color.com/archives/839
--  NTPで現在時間を取得
+      http://www.autumn-color.com/archives/839  
+-  NTPで現在時間を取得  
   -   参考サイト  
-      http://projectsbiotope.blogspot.com/2010/02/arduinoweb.html
+      http://projectsbiotope.blogspot.com/2010/02/arduinoweb.html  
   -   参考サイト  
-      http://www.shangtian.tokyo/entry/2017/06/19/232014
+      http://www.shangtian.tokyo/entry/2017/06/19/232014  
 * * *
 ### //使用中のピン
 
