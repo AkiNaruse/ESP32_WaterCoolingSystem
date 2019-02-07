@@ -63,6 +63,7 @@ const char *ssid = "";
 const char *password = "";
 const char* server = "";
 
+
 WiFiClient client;
 //関数の宣言
 void connectServer(float,float,float,float,float,float,float,float);
