@@ -22,13 +22,13 @@ TFT_eSPI tft = TFT_eSPI();       // Invoke custom library
 /*NeoPixel-------------------------------------------------------------------------*/
 #include <NeoPixelBus.h>
 #define PIXEL_PIN 22
-#define PIXEL_COUNT 5
+#define PIXEL_COUNT 143
 NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PIXEL_COUNT, PIXEL_PIN);
 
-#include <FastLED.h>
-const int DATA_PIN = 21;
-const int NUM_LEDS = 5;
-CRGB leds[NUM_LEDS];
+#include "FastLED.h"
+#define NUM_LEDS 6
+#define DATA_PIN 1
+CRGBArray<NUM_LEDS> leds;
 
 int RR=0,GG=0,BB=0,RRGGBB=0;
 
@@ -104,9 +104,7 @@ void setup() {
   strip.Show();
 
   // FastLEDの設定
-  FastLED.addLeds<WS2811, DATA_PIN, RGB>(leds, NUM_LEDS);
-  //FastLED.setBrightness(64);
-  //set_max_power_in_volts_and_milliamps(5, 100);
+  FastLED.addLeds<NEOPIXEL,DATA_PIN>(leds, NUM_LEDS);
 
 
  /*PWM制御-----------------------------------*/
@@ -208,14 +206,18 @@ void loop() {
     // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
     strip.SetPixelColor(i,RgbColor(RR,GG,BB)); // Moderately bright green color.
     //delay(delayval); // Delay for a period of time (in milliseconds).
-    strip.Show(); // This sends the updated pixel color to the hardware.
   }
+  strip.Show(); // This sends the updated pixel color to the hardware.
+
 
   //FastLED
-  for (int i = 0; i < NUM_LEDS; i++) {
-    leds[i] = CRGB( GG, RR, BB);
+
+  for(int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = CRGB(GG,RR,BB);
   }
+
   FastLED.show();
+
 
   //
   if(RRGGBB == 0){
