@@ -9,7 +9,7 @@ const int ledPin = 32;
 #include <ESP32_BME280_I2C.h>
 ESP32_BME280_I2C bme280i2c(0x76, 16, 17, 400000); //address, SCK, SDA, frequency
 char temp_c[10], hum_c[10], pres_c[10];
-float temp_cf, hum_cf, pres_cf;
+double temperature, pressure, humidity;
 
 /*BME280　室内温・気圧--------------------------------------------------------------*/
 
@@ -72,7 +72,6 @@ const char* server = "";
 WiFiClient client;
 //関数の宣言
 void connectServer(float,float,float,float,float,float,float,float);
-
 
 /*WiFi-----------------------------------------------------------------------------*/
 
@@ -224,7 +223,7 @@ void loop() {
 
   //PHPへ送信
   //関数に値を代入して実行
-  //connectServer(temp1,temp2,temp3,temp4,temp_cf,hum_cf,pres_cf,Flow);
+  connectServer(temp1,temp2,temp3,temp4,temperature,humidity,pressure,Flow);
   Serial.print(sensors.getTempC(sensor1));
   Serial.print(",");
   Serial.print(sensors.getTempC(sensor2));
@@ -305,21 +304,22 @@ void loop() {
 
 /************** BME280 測定 *************************/
 void bme_get(){
-  byte temperature = bme280i2c.Read_Temperature();
-  byte humidity = bme280i2c.Read_Humidity();
-  uint16_t pressure = bme280i2c.Read_Pressure();
+  bme280i2c.Read_All(&temperature, &pressure, &humidity);
 
-  sprintf(temp_c, "%2.2f", temperature);
-  sprintf(hum_c, "%2.2f", humidity);
-  sprintf(pres_c, "%4d", pressure);
-  /*
+  sprintf(temp_c, "%2.2lf", temperature);
+  sprintf(hum_c, "%2.2lf", humidity);
+  sprintf(pres_c, "%4.2lf", pressure);
+
+  Serial.println(temperature);
+
+/*
   Serial.println("-----------------------");
   Serial.print("Temperature = "); Serial.println(temp_c);
   Serial.print("Humidity = "); Serial.println(hum_c);
   Serial.print("Pressure = "); Serial.println(pres_c);
   Serial.println("-----------------------");
   Serial.flush();
-  */
+*/
 }
 
 
