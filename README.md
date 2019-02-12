@@ -8,7 +8,7 @@
 
 -   WINGONEER 3.5インチTFTタッチスクリーン、320x480解像度LCDディスプレイラズベリーパイ用  
       <https://www.amazon.co.jp/gp/product/B077XGK9MY/>
-    - 参考サイト  
+      - 参考サイト  
      <https://macsbug.wordpress.com/2017/08/12/how-to-use-a-tft-display-for-raspberry-pie-with-esp32/>
 
 * * *
@@ -17,7 +17,7 @@
 
 -   BME280搭載　温湿度・気圧センサモジュール  
       <https://www.switch-science.com/catalog/2236/>  
-  - 参考サイト  
+      - 参考サイト  
      <https://www.mgo-tec.com/blog-entry-esp32-bme280-sensor-library.html>  
 
 * * *
@@ -26,7 +26,7 @@
 
 -   DS18B20(Techcell)  
       <https://www.amazon.co.jp/gp/product/B07M886SBK/>  
-  - 参考サイト  
+      - 参考サイト  
      <https://randomnerdtutorials.com/esp32-with-multiple-ds18b20-temperature-sensors/>  
 
 * * *
@@ -35,12 +35,12 @@
 
 -   ALITOVE WS2812B LEDテープ1m 144連 NeoPixel RGB TAPE LED 5050 SMD LEDテープライトピクセル 防水 黒いベース 5V DC  
     <https://www.amazon.co.jp/gp/product/B01MYT6JH9/>
-  - 参考サイト  
+      - 参考サイト  
      <http://ogimotokin.hatenablog.com/entry/2018/12/25/005300>  
 
 -   NeoPixel スルーホールLED(半透明 5mm 5個入りパック)  
     <https://www.switch-science.com/catalog/1863/>
-  - 参考サイト  
+    - 参考サイト  
      <http://cammy.co.jp/technical/2016/01/23/arduino-007/>  
 
 * * *
@@ -49,7 +49,7 @@
 
 -   PC用ファンの制御
 
-  - 参考サイト  
+    - 参考サイト  
      <https://garretlab.web.fc2.com/arduino/esp32/lab/ledc/index.html>  
 
 * * *
@@ -59,7 +59,7 @@
 -   SEN0217 - WaterFlowSensor 水流量センサ
     <http://akizukidenshi.com/catalog/g/gM-12548/>
 
-  - 参考サイト  
+    - 参考サイト  
     <http://www.eleki-jack.com/sengokufan/2011/12/seeed-studio2.html>  
     (インターネットアーカイブは神)
 
@@ -70,7 +70,7 @@
 -   Riing 12 LED RGB 256  
     <https://www.thermaltake.com/products-model.aspx?id=C_00002731&o=1>  
 
-  - 参考サイト  
+    - 参考サイト  
     制御法思考中...
 
 * * *
@@ -78,7 +78,7 @@
 ### //PHP
 
 -   値を取得してPHPへ送信
-  - 参考サイト  
+    - 参考サイト  
     <http://projectsbiotope.blogspot.com/2010/02/arduinoweb.html>
 
 * * *
@@ -86,13 +86,13 @@
 ### //WiFiClient & NTP
 
 -   NTPで現在時間を取得  
-  - 参考サイト  
+    - 参考サイト  
     <http://www.autumn-color.com/archives/839>  
 
 -   NTPで現在時間を取得
-  - 参考サイト
+    - 参考サイト  
     <http://projectsbiotope.blogspot.com/2010/02/arduinoweb.html>
-  - 参考サイト
+    - 参考サイト  
     <http://www.shangtian.tokyo/entry/2017/06/19/232014>  
 
 * * *
