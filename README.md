@@ -7,9 +7,9 @@
 ### //TFT_eSPI
 
 -   WINGONEER 3.5インチTFTタッチスクリーン、320x480解像度LCDディスプレイラズベリーパイ用  
-      <https://www.amazon.co.jp/gp/product/B077XGK9MY/>  
+      <https://www.amazon.co.jp/gp/product/B077XGK9MY/>
   - 参考サイト  
-     <https://macsbug.wordpress.com/2017/08/12/how-to-use-a-tft-display-for-raspberry-pie-with-esp32/>  
+     <https://macsbug.wordpress.com/2017/08/12/how-to-use-a-tft-display-for-raspberry-pie-with-esp32/>
 
 * * *
 
