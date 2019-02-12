@@ -6,10 +6,11 @@ const int ledPin = 32;
 
 
 /*BME280　室内温・気圧--------------------------------------------------------------*/
-#include "ESP32_BME280_I2C.h"
+#include <ESP32_BME280_I2C.h>
 ESP32_BME280_I2C bme280i2c(0x76, 16, 17, 400000); //address, SCK, SDA, frequency
 char temp_c[10], hum_c[10], pres_c[10];
 float temp_cf, hum_cf, pres_cf;
+
 /*BME280　室内温・気圧--------------------------------------------------------------*/
 
 
@@ -28,10 +29,8 @@ NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PIXEL_COUNT, PIXEL_PIN);
 
 #include "FastLED.h"
 #define NUM_LEDS 6
-#define DATA_PIN 1
+#define DATA_PIN 4
 CRGBArray<NUM_LEDS> leds;
-
-char temp1_c[10], temp2_c[10], temp3_c[10], temp4_c[10];
 
 int RR=0,GG=0,BB=0,RRGGBB=0;
 
@@ -48,6 +47,9 @@ int RR=0,GG=0,BB=0,RRGGBB=0;
 OneWire oneWire(ONE_WIRE_BUS);
 // Pass our oneWire reference to Dallas Temperature sensor
 DallasTemperature sensors(&oneWire);
+
+char temp1_c[10], temp2_c[10], temp3_c[10], temp4_c[10];
+float temp1, temp2, temp3, temp4,Flow=300;
 
 DeviceAddress sensor1 = { 0x28, 0xAA, 0xDE, 0x9, 0x38, 0x14, 0x1, 0x90 };
 DeviceAddress sensor2 = { 0x28, 0xAA, 0xB5, 0xFC, 0x37, 0x14, 0x1, 0x5E };
@@ -72,7 +74,6 @@ WiFiClient client;
 void connectServer(float,float,float,float,float,float,float,float);
 
 
-float temp1, temp2, temp3, temp4,Flow=300;
 /*WiFi-----------------------------------------------------------------------------*/
 
 
@@ -87,7 +88,7 @@ void setup() {
  /*シリアル初期化-----------------------------*/
   Serial.begin(115200);
 
-/*WiFi---------------------------------------*/
+/*WiFi---------------------------------------
   Serial.print("\n\nStart\n");
 
   WiFi.begin(ssid, password);
@@ -98,7 +99,7 @@ void setup() {
   Serial.println();
   Serial.printf("Connected, IP address: ");
   Serial.println(WiFi.localIP());
-
+*/
 /*NTP----------------------------------------*/
   //configTime( JST, 0, "ntp.nict.jp", "ntp.jst.mfeed.ad.jp");
 
@@ -171,7 +172,7 @@ void loop() {
   bme_get();
 
 
-  //NeoPixel
+  /*NeoPixel*/
   //NeoPixelBus
   for(int i=0;i<PIXEL_COUNT;i++){
     // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
@@ -181,7 +182,7 @@ void loop() {
   strip.Show(); // This sends the updated pixel color to the hardware.
 
 
-  //FastLED
+  /*FastLED*/
 
   for(int i = 0; i < NUM_LEDS; i++) {
     leds[i] = CRGB(GG,RR,BB);
@@ -207,26 +208,14 @@ void loop() {
   //Serial.print("Requesting temperatures...");
   sensors.requestTemperatures(); // Send the command to get temperatures
   //Serial.println("DONE");
-
-  Serial.print("Sensor 1(*C): ");
-  //snprintf(temp1, 10, "%.2f", sensors.getTempC(sensor1));
+  //Serial.print("Sensor 1(*C): ");  Serial.println(sensors.getTempC(sensor1));
   temp1 = sensors.getTempC(sensor1);
-  Serial.println(sensors.getTempC(sensor1));
-
-  Serial.print("Sensor 2(*C): ");
-  //snprintf(temp2, 10, "%.2f", sensors.getTempC(sensor2));
+  //Serial.print("Sensor 2(*C): ");  Serial.println(sensors.getTempC(sensor2));
   temp2 = sensors.getTempC(sensor2);
-  Serial.println(sensors.getTempC(sensor2));
-
-  Serial.print("Sensor 3(*C): ");
-  //snprintf(temp3, 10, "%.2f", sensors.getTempC(sensor3));
+  //Serial.print("Sensor 3(*C): ");  Serial.println(sensors.getTempC(sensor3));
   temp3 = sensors.getTempC(sensor3);
-  Serial.println(sensors.getTempC(sensor3));
-
-  Serial.print("Sensor 4(*C): ");
-  //snprintf(temp4, 10, "%.2f", sensors.getTempC(sensor4));
+  //Serial.print("Sensor 4(*C): ");  Serial.println(sensors.getTempC(sensor4));
   temp4 = sensors.getTempC(sensor4);
-  Serial.println(sensors.getTempC(sensor4));
 
 
  //Serial.println("Hello World!"); Serial.print("PWM = "); Serial.println(brightness);
@@ -235,7 +224,22 @@ void loop() {
 
   //PHPへ送信
   //関数に値を代入して実行
-  connectServer(temp1,temp2,temp3,temp4,temp_cf,hum_cf,pres_cf,Flow);
+  //connectServer(temp1,temp2,temp3,temp4,temp_cf,hum_cf,pres_cf,Flow);
+  Serial.print(sensors.getTempC(sensor1));
+  Serial.print(",");
+  Serial.print(sensors.getTempC(sensor2));
+  Serial.print(",");
+  Serial.print(sensors.getTempC(sensor3));
+  Serial.print(",");
+  Serial.print(sensors.getTempC(sensor4));
+  Serial.print(",");
+  Serial.print(temp_c);
+  Serial.print(",");
+  Serial.print(hum_c);
+  Serial.print(",");
+  Serial.print(pres_c);
+  Serial.print(",");
+  Serial.println(Flow);
 
 
   /*TFT_eSPI*/
@@ -301,23 +305,21 @@ void loop() {
 
 /************** BME280 測定 *************************/
 void bme_get(){
-  byte temperature = (byte)round(bme280i2c.Read_Temperature());
-  byte humidity = (byte)round(bme280i2c.Read_Humidity());
-  uint16_t pressure = (uint16_t)round(bme280i2c.Read_Pressure());
+  byte temperature = bme280i2c.Read_Temperature();
+  byte humidity = bme280i2c.Read_Humidity();
+  uint16_t pressure = bme280i2c.Read_Pressure();
 
-  sprintf(temp_c, "%2d", temperature);
-  sprintf(hum_c, "%2d", humidity);
+  sprintf(temp_c, "%2.2f", temperature);
+  sprintf(hum_c, "%2.2f", humidity);
   sprintf(pres_c, "%4d", pressure);
-  float *temp_cf = (float*)temperature;
-  float *hum_cf = (float*)humidity;
-  float *pres_cf = (float*)pressure;
-
+  /*
   Serial.println("-----------------------");
   Serial.print("Temperature = "); Serial.println(temp_c);
   Serial.print("Humidity = "); Serial.println(hum_c);
   Serial.print("Pressure = "); Serial.println(pres_c);
   Serial.println("-----------------------");
   Serial.flush();
+  */
 }
 
 

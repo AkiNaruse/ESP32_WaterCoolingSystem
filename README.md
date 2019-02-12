@@ -127,7 +127,7 @@
       <td align="center"></td>
       <td align="center">39</td>
       <td align="center">1</td>
-      <td align="center">NeoPixel-6連</td>
+      <td align="center"></td>
     </tr>
     <tr>
       <td align="center"></td>
@@ -181,7 +181,7 @@
       <td align="center"></td>
       <td align="center">12</td>
       <td align="center">4</td>
-      <td align="center"></td>
+      <td align="center">NeoPixel-6連</td>
     </tr>
     <tr>
       <td align="center" bgcolor="#000000"></td>
