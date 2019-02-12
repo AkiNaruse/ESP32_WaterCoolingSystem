@@ -9,6 +9,7 @@ const int ledPin = 32;
 #include "ESP32_BME280_I2C.h"
 ESP32_BME280_I2C bme280i2c(0x76, 16, 17, 400000); //address, SCK, SDA, frequency
 char temp_c[10], hum_c[10], pres_c[10];
+float temp_cf, hum_cf, pres_cf;
 /*BME280　室内温・気圧--------------------------------------------------------------*/
 
 
@@ -29,6 +30,8 @@ NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PIXEL_COUNT, PIXEL_PIN);
 #define NUM_LEDS 6
 #define DATA_PIN 1
 CRGBArray<NUM_LEDS> leds;
+
+char temp1_c[10], temp2_c[10], temp3_c[10], temp4_c[10];
 
 int RR=0,GG=0,BB=0,RRGGBB=0;
 
@@ -68,7 +71,8 @@ WiFiClient client;
 //関数の宣言
 void connectServer(float,float,float,float,float,float,float,float);
 
-float temp0=20,temp1=20,temp2=20,temp3=20,temp4=20,Humi=50,APress=998,Flow=300;
+
+float temp1, temp2, temp3, temp4,Flow=300;
 /*WiFi-----------------------------------------------------------------------------*/
 
 
@@ -96,7 +100,7 @@ void setup() {
   Serial.println(WiFi.localIP());
 
 /*NTP----------------------------------------*/
-  configTime( JST, 0, "ntp.nict.jp", "ntp.jst.mfeed.ad.jp");
+  //configTime( JST, 0, "ntp.nict.jp", "ntp.jst.mfeed.ad.jp");
 
 
  /*NeoPixel----------------------------------*/
@@ -133,56 +137,22 @@ void setup() {
 
 
   //DS18B20(1-Wire)
-  //delay(1000);
+  delay(1000);
 
 }
 
 
 void loop() {
 
-  /*NTP*/
+  /*NTP
   time_t t;
   struct tm *tm;
   static const char *wd[7] = {"Sun","Mon","Tue","Wed","Thr","Fri","Sat"};
 
   t = time(NULL);
   tm = localtime(&t);
-  Serial.printf(" %04d/%02d/%02d(%s) %02d:%02d:%02d\n",
-        tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday,
-        wd[tm->tm_wday],
-        tm->tm_hour, tm->tm_min, tm->tm_sec);
-
-
-
-  /*TFT_eSPI*/
-  int xpos;
-  //Measure time to clear screen
-  // Print numbers
-  yield();
-  tft.setTextColor(TFT_RED, TFT_BLACK);
-  xpos = 10;
-  xpos += tft.drawString("PWM = ", xpos, 10, 4);
-  tft.setTextColor(TFT_WHITE, TFT_BLACK);
-  tft.drawNumber(brightness, xpos, 10, 4);
-
-  tft.setTextColor(TFT_RED, TFT_BLACK);
-  xpos = 10;
-  xpos += tft.drawString("Temperature = ", xpos, 40, 4);
-  tft.setTextColor(TFT_WHITE, TFT_BLACK);
-  tft.drawString(temp_c, xpos, 40, 4);
-
-  tft.setTextColor(TFT_RED, TFT_BLACK);
-  xpos = 10;
-  xpos += tft.drawString("Humidity = ", xpos, 80, 4);
-  tft.setTextColor(TFT_WHITE, TFT_BLACK);
-  tft.drawString(hum_c, xpos, 80, 4);
-
-  tft.setTextColor(TFT_RED, TFT_BLACK);
-  xpos = 10;
-  xpos += tft.drawString("Pressure =  ", xpos, 120, 4);
-  tft.setTextColor(TFT_WHITE, TFT_BLACK);
-  tft.drawString(pres_c, xpos, 120, 4);
-
+  Serial.printf(" %04d/%02d/%02d(%s) %02d:%02d:%02d\n",tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday,wd[tm->tm_wday],tm->tm_hour, tm->tm_min, tm->tm_sec);
+*/
 
   /*PWM制御*/
   ledcWrite(0, brightness);
@@ -239,15 +209,23 @@ void loop() {
   //Serial.println("DONE");
 
   Serial.print("Sensor 1(*C): ");
+  //snprintf(temp1, 10, "%.2f", sensors.getTempC(sensor1));
+  temp1 = sensors.getTempC(sensor1);
   Serial.println(sensors.getTempC(sensor1));
 
   Serial.print("Sensor 2(*C): ");
+  //snprintf(temp2, 10, "%.2f", sensors.getTempC(sensor2));
+  temp2 = sensors.getTempC(sensor2);
   Serial.println(sensors.getTempC(sensor2));
 
   Serial.print("Sensor 3(*C): ");
+  //snprintf(temp3, 10, "%.2f", sensors.getTempC(sensor3));
+  temp3 = sensors.getTempC(sensor3);
   Serial.println(sensors.getTempC(sensor3));
 
   Serial.print("Sensor 4(*C): ");
+  //snprintf(temp4, 10, "%.2f", sensors.getTempC(sensor4));
+  temp4 = sensors.getTempC(sensor4);
   Serial.println(sensors.getTempC(sensor4));
 
 
@@ -257,7 +235,65 @@ void loop() {
 
   //PHPへ送信
   //関数に値を代入して実行
-  connectServer(temp0,temp1,temp2,temp3,temp4,Humi,APress,Flow);
+  connectServer(temp1,temp2,temp3,temp4,temp_cf,hum_cf,pres_cf,Flow);
+
+
+  /*TFT_eSPI*/
+  int xpos;
+  //Measure time to clear screen
+  // Print numbers
+  yield();
+  tft.setTextColor(TFT_RED, TFT_BLACK);
+  xpos = 10;
+  xpos += tft.drawString("PWM = ", xpos, 10, 4);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.drawNumber(brightness, xpos, 10, 4);
+
+  tft.setTextColor(TFT_RED, TFT_BLACK);
+  xpos = 10;
+  xpos += tft.drawString("Temperature = ", xpos, 40, 4);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.drawString(temp_c, xpos, 40, 4);
+
+  tft.setTextColor(TFT_RED, TFT_BLACK);
+  xpos = 10;
+  xpos += tft.drawString("Humidity = ", xpos, 80, 4);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.drawString(hum_c, xpos, 80, 4);
+
+  tft.setTextColor(TFT_RED, TFT_BLACK);
+  xpos = 10;
+  xpos += tft.drawString("Pressure =  ", xpos, 120, 4);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.drawString(pres_c, xpos, 120, 4);
+
+  tft.setTextColor(TFT_RED, TFT_BLACK);
+  xpos = 10;
+  xpos += tft.drawString("temp1 =  ", xpos, 160, 4);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  snprintf(temp1_c, 10, "%.2f", temp1);
+  tft.drawString(temp1_c, xpos, 160, 4);
+
+  tft.setTextColor(TFT_RED, TFT_BLACK);
+  xpos = 10;
+  xpos += tft.drawString("temp2 =  ", xpos, 200, 4);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  snprintf(temp2_c, 10, "%.2f", temp2);
+  tft.drawString(temp2_c, xpos, 200, 4);
+
+  tft.setTextColor(TFT_RED, TFT_BLACK);
+  xpos = 10;
+  xpos += tft.drawString("temp3 =  ", xpos, 240, 4);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  snprintf(temp3_c, 10, "%.2f", temp3);
+  tft.drawString(temp3_c, xpos, 240, 4);
+
+  tft.setTextColor(TFT_RED, TFT_BLACK);
+  xpos = 10;
+  xpos += tft.drawString("temp4 =  ", xpos, 280, 4);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  snprintf(temp4_c, 10, "%.2f", temp4);
+  tft.drawString(temp4_c, xpos, 280, 4);
 
  delay(1000);
 }
@@ -269,9 +305,12 @@ void bme_get(){
   byte humidity = (byte)round(bme280i2c.Read_Humidity());
   uint16_t pressure = (uint16_t)round(bme280i2c.Read_Pressure());
 
-  sprintf(temp_c, "%2d ℃", temperature);
-  sprintf(hum_c, "%2d ％", humidity);
-  sprintf(pres_c, "%4d hPa", pressure);
+  sprintf(temp_c, "%2d", temperature);
+  sprintf(hum_c, "%2d", humidity);
+  sprintf(pres_c, "%4d", pressure);
+  float *temp_cf = (float*)temperature;
+  float *hum_cf = (float*)humidity;
+  float *pres_cf = (float*)pressure;
 
   Serial.println("-----------------------");
   Serial.print("Temperature = "); Serial.println(temp_c);
@@ -284,20 +323,20 @@ void bme_get(){
 
 /************** PHPへ送信 *************************/
 //サーバーに接続し値を送る
-void connectServer(float t0, float t1,float t2, float t3,float t4, float h,float p, float f) {
+void connectServer(float t1,float t2,float  t3,float t4,float t5, float h,float p, float f) {
   if(client.connect(server, 80)){
     Serial.println("connected to server");
     // 指定のwebサーバのPHPスクリプトにGET送信
     client.print("GET /monitor/receive.php?temp0=");
-    client.print(t0);
-    client.print("&temp1=");
     client.print(t1);
-    client.print("&temp2=");
+    client.print("&temp1=");
     client.print(t2);
-    client.print("&temp3=");
+    client.print("&temp2=");
     client.print(t3);
-    client.print("&temp4=");
+    client.print("&temp3=");
     client.print(t4);
+    client.print("&temp4=");
+    client.print(t5);
     client.print("&Humi=");
     client.print(h);
     client.print("&APress=");
