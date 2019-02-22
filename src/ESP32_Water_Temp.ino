@@ -1,7 +1,7 @@
 /*PWM制御--------------------------------------------------------------------------*/
-static uint8_t brightness = 0;
+static uint8_t power = 0;
 static int diff = 5;
-const int ledPin = 32;
+const int PWMPin = 32;
 /*PWM制御--------------------------------------------------------------------------*/
 
 
@@ -116,7 +116,7 @@ void setup() {
   // PWM制御の初期化
   // put your setup code here, to run once:
   ledcSetup(0, 60, 8);
-  ledcAttachPin(ledPin, 0);
+  ledcAttachPin(PWMPin, 0);
 
 
   /*TFT_eSPI---------------------------------*/
@@ -155,15 +155,15 @@ void loop() {
 */
 
   /*PWM制御*/
-  ledcWrite(0, brightness);
+  ledcWrite(0, power);
 
-  if (brightness == 0) {
+  if (power == 0) {
     diff = 5;
-  } else if (brightness == 255) {
+  } else if (power == 255) {
     diff = -5;
   }
 
-  brightness += diff;
+  power += diff;
 
 
 
@@ -217,7 +217,7 @@ void loop() {
   temp4 = sensors.getTempC(sensor4);
 
 
- //Serial.println("Hello World!"); Serial.print("PWM = "); Serial.println(brightness);
+ //Serial.println("Hello World!"); Serial.print("PWM = "); Serial.println(power);
  //Serial.println(NN);
   Serial.println(RRGGBB);
 
@@ -250,7 +250,7 @@ void loop() {
   xpos = 10;
   xpos += tft.drawString("PWM = ", xpos, 10, 4);
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
-  tft.drawNumber(brightness, xpos, 10, 4);
+  tft.drawNumber(power, xpos, 10, 4);
 
   tft.setTextColor(TFT_RED, TFT_BLACK);
   xpos = 10;
