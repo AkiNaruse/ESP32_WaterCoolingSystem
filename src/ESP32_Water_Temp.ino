@@ -1,16 +1,24 @@
 /*PWM制御--------------------------------------------------------------------------*/
-static uint8_t power = 0;
+static uint8_t power = 240 ,FAN1_p = 0, FAN2_p = 0;
 static int diff = 5;
-const int PWMPin = 32;
+const int FAN1Pin = 36 ,FAN2Pin = 39 ,PumpPin = 34;
+
 /*PWM制御--------------------------------------------------------------------------*/
 
+
+/*流量計----------------------------------------------------------------------------*/
+volatile int num_pulse;
+int rotate_value,rotate_value_before;
+float flow_sum,flow_rate;
+char c_flow_rate[6];
+int ir_port = 14;
+/*流量計----------------------------------------------------------------------------*/
 
 /*BME280　室内温・気圧--------------------------------------------------------------*/
 #include <ESP32_BME280_I2C.h>
 ESP32_BME280_I2C bme280i2c(0x76, 16, 17, 400000); //address, SCK, SDA, frequency
 char temp_c[10], hum_c[10], pres_c[10];
 double temperature, pressure, humidity;
-
 /*BME280　室内温・気圧--------------------------------------------------------------*/
 
 
@@ -33,7 +41,6 @@ NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PIXEL_COUNT, PIXEL_PIN);
 CRGBArray<NUM_LEDS> leds;
 
 int RR=0,GG=0,BB=0,RRGGBB=0;
-
 /*NeoPixel-------------------------------------------------------------------------*/
 
 
@@ -72,7 +79,6 @@ const char* server = "";
 WiFiClient client;
 //関数の宣言
 void connectServer(float,float,float,float,float,float,float,float);
-
 /*WiFi-----------------------------------------------------------------------------*/
 
 
@@ -115,8 +121,15 @@ void setup() {
  /*PWM制御-----------------------------------*/
   // PWM制御の初期化
   // put your setup code here, to run once:
-  ledcSetup(0, 60, 8);
-  ledcAttachPin(PWMPin, 0);
+  //FAN1
+  ledcSetup(0, 25000, 8);
+  ledcAttachPin(FAN1Pin, 0);
+  //FAN2
+  ledcSetup(1, 25000, 8);
+  ledcAttachPin(FAN2Pin, 1);
+  //Pump
+  ledcSetup(2, 25000, 8);
+  ledcAttachPin(PumpPin, 2);
 
 
   /*TFT_eSPI---------------------------------*/
@@ -126,7 +139,7 @@ void setup() {
 
 
   /*BME280-----------------------------------*/
-  delay(1000); //Take some time to open up the Serial Monitor
+  //delay(1000); //Take some time to open up the Serial Monitor
   uint8_t t_sb = 0; //stanby 0.5ms
   uint8_t filter = 4; //IIR filter = 16
   uint8_t osrs_t = 2; //OverSampling Temperature x2
@@ -135,9 +148,11 @@ void setup() {
   uint8_t Mode = 3; //Normal mode
   bme280i2c.ESP32_BME280_I2C_Init(t_sb, filter, osrs_t, osrs_p, osrs_h, Mode);
 
+  //流量計初期処理
+  pinMode(ir_port, INPUT);
+  attachInterrupt(0, sum_pulse, RISING);
 
-  //DS18B20(1-Wire)
-  delay(1000);
+  //delay(1000);
 
 }
 
@@ -155,17 +170,15 @@ void loop() {
 */
 
   /*PWM制御*/
-  ledcWrite(0, power);
-
-  if (power == 0) {
-    diff = 5;
-  } else if (power == 255) {
+  ledcWrite(0, FAN1_p);
+  ledcWrite(1, FAN2_p);
+    if (FAN2_p == 0) {
+      diff = 5;
+    } else if (FAN2_p == 255) {
     diff = -5;
-  }
-
-  power += diff;
-
-
+    }
+    FAN2_p += diff;
+  ledcWrite(2, power);
 
   /*BME280*/
   bme_get();
@@ -298,8 +311,31 @@ void loop() {
   snprintf(temp4_c, 10, "%.2f", temp4);
   tft.drawString(temp4_c, xpos, 280, 4);
 
- delay(1000);
+
+  //流量計
+  rotate_value_before=num_pulse;
+
+
+  delay(1000);
+
+
+  //流量計
+  rotate_value=num_pulse;
+  flow_rate = (rotate_value-rotate_value_before)* 60  / 7.5;
+  //(Pulse frequency x 60) / 7.5Q, = flow rate in L/hour
+  //dtostrf(flow_rate, 4, 1, c_flow_rate);
+  //dtostrf(celsius, 4, 1, c_celsius);
+  Serial.print (flow_rate, DEC);
+  Serial.print (" L/h ");
+
 }
+
+
+/************** 流量計 *************************/
+void sum_pulse (){
+   num_pulse++;
+}
+/************** 流量計 *************************/
 
 
 /************** BME280 測定 *************************/

@@ -89,7 +89,7 @@
     - 参考サイト  
     <http://www.autumn-color.com/archives/839>  
 
--   NTPで現在時間を取得
+-   WiFiClient
     - 参考サイト  
     <http://projectsbiotope.blogspot.com/2010/02/arduinoweb.html>
     - 参考サイト  
@@ -118,19 +118,19 @@
       <td align="center">TFT_eSPI</td>
     </tr>
     <tr>
-      <td align="center"></td>
+      <td align="center">FAN1</td>
       <td align="center">36</td>
       <td align="center">22</td>
       <td align="center">NeoPixel-144連</td>
     </tr>
     <tr>
-      <td align="center"></td>
+      <td align="center">FAN2</td>
       <td align="center">39</td>
       <td align="center">1</td>
       <td align="center">Serial TX</td>
     </tr>
     <tr>
-      <td align="center"></td>
+      <td align="center">Pump</td>
       <td align="center">34</td>
       <td align="center">3</td>
       <td align="center">Serial RX</td>
@@ -142,7 +142,7 @@
       <td align="center"></td>
     </tr>
     <tr>
-      <td align="center">PWM制御</td>
+      <td align="center"></td>
       <td align="center">32</td>
       <td align="center" bgcolor="#000000"><font COLOR="#ffffff"><b>GND</b></font></td>
       <td align="center" bgcolor="#000000"></td>
@@ -172,7 +172,7 @@
       <td align="center">BME280</td>
     </tr>
     <tr>
-      <td align="center"></td>
+      <td align="center">流量計</td>
       <td align="center">14</td>
       <td align="center">16</td>
       <td align="center">BME280</td>
@@ -224,7 +224,7 @@
 </table>
 * * *
 
-### //WiFiClient & NTP
+### //ESP-WROOM-32に関するTIPS
 
 -   ESP-WROOM-32に関するTIPS  
     - 参考サイト  
