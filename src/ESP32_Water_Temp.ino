@@ -12,6 +12,7 @@ int rotate_value,rotate_value_before;
 float flow_sum,flow_rate;
 char c_flow_rate[6];
 int ir_port = 14;
+
 /*流量計----------------------------------------------------------------------------*/
 
 /*BME280　室内温・気圧--------------------------------------------------------------*/
@@ -56,7 +57,7 @@ OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 
 char temp1_c[10], temp2_c[10], temp3_c[10], temp4_c[10];
-float temp1, temp2, temp3, temp4,Flow=300;
+float temp1, temp2, temp3, temp4;
 
 DeviceAddress sensor1 = { 0x28, 0xAA, 0xDE, 0x9, 0x38, 0x14, 0x1, 0x90 };
 DeviceAddress sensor2 = { 0x28, 0xAA, 0xB5, 0xFC, 0x37, 0x14, 0x1, 0x5E };
@@ -150,7 +151,7 @@ void setup() {
 
   //流量計初期処理
   pinMode(ir_port, INPUT);
-  attachInterrupt(0, sum_pulse, RISING);
+  attachInterrupt(ir_port, sum_pulse, RISING);
 
   //delay(1000);
 
@@ -236,7 +237,7 @@ void loop() {
 
   //PHPへ送信
   //関数に値を代入して実行
-  connectServer(temp1,temp2,temp3,temp4,temperature,humidity,pressure,Flow);
+  connectServer(temp1,temp2,temp3,temp4,temperature,humidity,pressure,flow_rate);
   Serial.print(sensors.getTempC(sensor1));
   Serial.print(",");
   Serial.print(sensors.getTempC(sensor2));
@@ -251,7 +252,7 @@ void loop() {
   Serial.print(",");
   Serial.print(pres_c);
   Serial.print(",");
-  Serial.println(Flow);
+  Serial.println(flow_rate);
 
 
   /*TFT_eSPI*/
@@ -259,6 +260,9 @@ void loop() {
   //Measure time to clear screen
   // Print numbers
   yield();
+
+  tft.fillScreen(TFT_BLACK);
+  
   tft.setTextColor(TFT_RED, TFT_BLACK);
   xpos = 10;
   xpos += tft.drawString("PWM = ", xpos, 10, 4);
@@ -311,6 +315,14 @@ void loop() {
   snprintf(temp4_c, 10, "%.2f", temp4);
   tft.drawString(temp4_c, xpos, 280, 4);
 
+//--- R -----------------------------------------------
+
+tft.setTextColor(TFT_RED, TFT_BLACK);
+xpos = 250;
+xpos += tft.drawString("Flow = ", xpos, 10, 4);
+tft.setTextColor(TFT_WHITE, TFT_BLACK);
+tft.drawString(c_flow_rate, xpos-250, 10, 4);
+
 
   //流量計
   rotate_value_before=num_pulse;
@@ -323,10 +335,10 @@ void loop() {
   rotate_value=num_pulse;
   flow_rate = (rotate_value-rotate_value_before)* 60  / 7.5;
   //(Pulse frequency x 60) / 7.5Q, = flow rate in L/hour
-  //dtostrf(flow_rate, 4, 1, c_flow_rate);
+  dtostrf(flow_rate, 4, 1, c_flow_rate);
   //dtostrf(celsius, 4, 1, c_celsius);
-  Serial.print (flow_rate, DEC);
-  Serial.print (" L/h ");
+  //Serial.print (flow_rate, DEC);
+  //Serial.println (" L/h ");
 
 }
 
