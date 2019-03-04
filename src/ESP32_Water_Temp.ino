@@ -1,7 +1,7 @@
 /*PWM制御--------------------------------------------------------------------------*/
 static uint8_t power = 240 ,FAN1_p = 0, FAN2_p = 0;
 static int diff = 5;
-const int FAN1Pin = 36 ,FAN2Pin = 39 ,PumpPin = 34;
+const int FAN1Pin = 25 ,FAN2Pin = 26 ,PumpPin = 27;
 
 /*PWM制御--------------------------------------------------------------------------*/
 
@@ -37,7 +37,7 @@ TFT_eSPI tft = TFT_eSPI();       // Invoke custom library
 NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PIXEL_COUNT, PIXEL_PIN);
 
 #include "FastLED.h"
-#define NUM_LEDS 6
+#define NUM_LEDS 8
 #define DATA_PIN 4
 CRGBArray<NUM_LEDS> leds;
 
@@ -105,7 +105,7 @@ void setup() {
   Serial.println();
   Serial.printf("Connected, IP address: ");
   Serial.println(WiFi.localIP());
-*/
+
 /*NTP----------------------------------------*/
   //configTime( JST, 0, "ntp.nict.jp", "ntp.jst.mfeed.ad.jp");
 
@@ -173,14 +173,16 @@ void loop() {
   /*PWM制御*/
   ledcWrite(0, FAN1_p);
   ledcWrite(1, FAN2_p);
+  /*
     if (FAN2_p == 0) {
       diff = 5;
     } else if (FAN2_p == 255) {
     diff = -5;
     }
     FAN2_p += diff;
+    */
   ledcWrite(2, power);
-
+  Serial.println(FAN2_p);
   /*BME280*/
   bme_get();
 
@@ -198,7 +200,7 @@ void loop() {
   /*FastLED*/
 
   for(int i = 0; i < NUM_LEDS; i++) {
-    leds[i] = CRGB(GG,RR,BB);
+    leds[i] = CRGB(RR,GG,BB);
   }
 
   FastLED.show();
@@ -206,10 +208,10 @@ void loop() {
 
   //
   if(RRGGBB == 0){
-    RR=5;GG=0;BB=0;
+    RR=0;GG=0;BB=5;
     RRGGBB++;
   }else if (RRGGBB == 1) {
-    RR=0;GG=5;BB=0;
+    RR=0;GG=0;BB=5;
     RRGGBB++;
   }else if (RRGGBB >= 2) {
     RR=0;GG=0;BB=5;
@@ -262,7 +264,7 @@ void loop() {
   yield();
 
   tft.fillScreen(TFT_BLACK);
-  
+
   tft.setTextColor(TFT_RED, TFT_BLACK);
   xpos = 10;
   xpos += tft.drawString("PWM = ", xpos, 10, 4);

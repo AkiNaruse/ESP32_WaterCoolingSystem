@@ -118,19 +118,19 @@
       <td align="center">TFT_eSPI</td>
     </tr>
     <tr>
-      <td align="center">FAN1</td>
+      <td align="center"></td>
       <td align="center">36</td>
       <td align="center">22</td>
       <td align="center">NeoPixel-144連</td>
     </tr>
     <tr>
-      <td align="center">FAN2</td>
+      <td align="center"></td>
       <td align="center">39</td>
       <td align="center">1</td>
       <td align="center">Serial TX</td>
     </tr>
     <tr>
-      <td align="center">Pump</td>
+      <td align="center"></td>
       <td align="center">34</td>
       <td align="center">3</td>
       <td align="center">Serial RX</td>
@@ -154,19 +154,19 @@
       <td align="center">DS18B20</td>
     </tr>
     <tr>
-      <td align="center"></td>
+      <td align="center">FAN1</td>
       <td align="center">25</td>
       <td align="center">18</td>
       <td align="center">TFT_eSPI</td>
     </tr>
     <tr>
-      <td align="center"></td>
+      <td align="center">FAN2</td>
       <td align="center">26</td>
       <td align="center">5</td>
       <td align="center">TFT_eSPI</td>
     </tr>
     <tr>
-      <td align="center"></td>
+      <td align="center">Pump</td>
       <td align="center">27</td>
       <td align="center">17</td>
       <td align="center">BME280</td>
