@@ -97,6 +97,13 @@
 
 * * *
 
+### //ボリューム
+
+-   ボリュームの値を得る
+    - 参考サイト  
+    <https://msr-r.net/esp32-sample-sketch/>
+
+* * *
 ### //使用中のピン
 
 <table>
@@ -118,22 +125,22 @@
       <td align="center">TFT_eSPI</td>
     </tr>
     <tr>
-      <td align="center"></td>
+      <td align="center">ボリューム</td>
       <td align="center">36</td>
       <td align="center">22</td>
       <td align="center">NeoPixel-144連</td>
     </tr>
     <tr>
-      <td align="center"></td>
+      <td align="center">流量計</td>
       <td align="center">39</td>
       <td align="center">1</td>
-      <td align="center">Serial TX</td>
+      <td align="center">---</td>
     </tr>
     <tr>
       <td align="center"></td>
       <td align="center">34</td>
       <td align="center">3</td>
-      <td align="center">Serial RX</td>
+      <td align="center">---</td>
     </tr>
     <tr>
       <td align="center"></td>
@@ -154,31 +161,31 @@
       <td align="center">DS18B20</td>
     </tr>
     <tr>
-      <td align="center">FAN1</td>
+      <td align="center"></td>
       <td align="center">25</td>
       <td align="center">18</td>
       <td align="center">TFT_eSPI</td>
     </tr>
     <tr>
-      <td align="center">FAN2</td>
+      <td align="center"></td>
       <td align="center">26</td>
       <td align="center">5</td>
       <td align="center">TFT_eSPI</td>
     </tr>
     <tr>
-      <td align="center">Pump</td>
+      <td align="center">FAN1</td>
       <td align="center">27</td>
       <td align="center">17</td>
       <td align="center">BME280</td>
     </tr>
     <tr>
-      <td align="center">流量計</td>
+      <td align="center">FAN2</td>
       <td align="center">14</td>
       <td align="center">16</td>
       <td align="center">BME280</td>
     </tr>
     <tr>
-      <td align="center">MTDI</td>
+      <td align="center">Pump</td>
       <td align="center">12</td>
       <td align="center">4</td>
       <td align="center">NeoPixel-6連</td>
@@ -187,41 +194,42 @@
       <td align="center" bgcolor="#000000"></td>
       <td align="center" bgcolor="#000000"><font COLOR="#ffffff"><b>GND</b></font></td>
       <td align="center">0</td>
-      <td align="center">BOOT</td>
+      <td align="center">---</td>
     </tr>
     <tr>
       <td align="center">TFT_eSPI</td>
       <td align="center">13</td>
       <td align="center">2</td>
-      <td align="center">BOOT</td>
+      <td align="center">---</td>
     </tr>
     <tr>
-      <td align="center">FLASH</td>
+      <td align="center">---</td>
       <td align="center">9</td>
       <td align="center">15</td>
       <td align="center"></td>
     </tr>
     <tr>
-      <td align="center">FLASH</td>
+      <td align="center">---</td>
       <td align="center">10</td>
       <td align="center">8</td>
-      <td align="center">FLASH</td>
+      <td align="center">---</td>
     </tr>
     <tr>
-      <td align="center">FLASH</td>
+      <td align="center">---</td>
       <td align="center">11</td>
       <td align="center">7</td>
-      <td align="center">FLASH</td>
+      <td align="center">---</td>
     </tr>
     <tr>
       <td align="center" bgcolor="#ff0000"></td>
       <td align="center" bgcolor="#ff0000"><font COLOR="#ffff00"><b>5V</b></font></td>
       <td align="center" bgcolor="#666666"><b>　 USB　</b></td>
       <td align="center">6</td>
-      <td align="center">FLASH</td>
+      <td align="center">---</td>
     </tr>
   </tbody>
 </table>
+
 * * *
 
 ### //ESP-WROOM-32に関するTIPS

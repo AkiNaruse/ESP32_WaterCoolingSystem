@@ -1,7 +1,7 @@
 /*PWM制御--------------------------------------------------------------------------*/
 static uint8_t power = 240 ,FAN1_p = 0, FAN2_p = 0;
 static int diff = 5;
-const int FAN1Pin = 25 ,FAN2Pin = 26 ,PumpPin = 27;
+const int FAN1Pin = 27 ,FAN2Pin = 14 ,PumpPin = 12;
 
 /*PWM制御--------------------------------------------------------------------------*/
 
@@ -11,7 +11,7 @@ volatile int num_pulse;
 int rotate_value,rotate_value_before;
 float flow_sum,flow_rate;
 char c_flow_rate[6];
-int ir_port = 14;
+int ir_port = 39;
 
 /*流量計----------------------------------------------------------------------------*/
 
@@ -183,8 +183,17 @@ void loop() {
     */
   ledcWrite(2, power);
   Serial.println(FAN2_p);
+
+
   /*BME280*/
   bme_get();
+
+
+  /*ボリューム*/
+  // read the input on analog pin 0:
+  int sensorValue = analogRead(A0)/32;
+  // print out the value you read:
+  Serial.println(sensorValue);
 
 
   /*NeoPixel*/
