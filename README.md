@@ -149,25 +149,25 @@
       <td align="center"></td>
     </tr>
     <tr>
-      <td align="center"></td>
+      <td align="center">リレー4</td>
       <td align="center">32</td>
       <td align="center" bgcolor="#000000"><font COLOR="#ffffff"><b>GND</b></font></td>
       <td align="center" bgcolor="#000000"></td>
     </tr>
     <tr>
-      <td align="center"></td>
+      <td align="center">リレー3</td>
       <td align="center">33</td>
       <td align="center">19</td>
       <td align="center">DS18B20</td>
     </tr>
     <tr>
-      <td align="center"></td>
+      <td align="center">リレー2</td>
       <td align="center">25</td>
       <td align="center">18</td>
       <td align="center">TFT_eSPI</td>
     </tr>
     <tr>
-      <td align="center"></td>
+      <td align="center">リレー1</td>
       <td align="center">26</td>
       <td align="center">5</td>
       <td align="center">TFT_eSPI</td>

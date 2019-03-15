@@ -1,3 +1,8 @@
+/*リレー制御------------------------------------------------------------------------*/
+int Relay_1=26,Relay_2=25,Relay_3=32,Relay_4=33;
+/*リレー制御------------------------------------------------------------------------*/
+
+
 /*PWM制御--------------------------------------------------------------------------*/
 static uint8_t power = 240 ,FAN1_p = 0, FAN2_p = 0;
 static int diff = 5;
@@ -41,7 +46,7 @@ NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PIXEL_COUNT, PIXEL_PIN);
 #define DATA_PIN 4
 CRGBArray<NUM_LEDS> leds;
 
-int RR=0,GG=0,BB=0,RRGGBB=0;
+int RR=0,GG=0,BB=0,RRGGBB=0,BRT=0;
 /*NeoPixel-------------------------------------------------------------------------*/
 
 
@@ -153,6 +158,16 @@ void setup() {
   pinMode(ir_port, INPUT);
   attachInterrupt(ir_port, sum_pulse, RISING);
 
+  //リレー
+  pinMode(Relay_1, OUTPUT);
+  pinMode(Relay_2, OUTPUT);
+  pinMode(Relay_3, OUTPUT);
+  pinMode(Relay_4, OUTPUT);
+  digitalWrite(Relay_1, HIGH);
+  digitalWrite(Relay_2, HIGH);
+  digitalWrite(Relay_3, HIGH);
+  digitalWrite(Relay_4, HIGH);
+
   //delay(1000);
 
 }
@@ -168,6 +183,13 @@ void loop() {
   t = time(NULL);
   tm = localtime(&t);
   Serial.printf(" %04d/%02d/%02d(%s) %02d:%02d:%02d\n",tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday,wd[tm->tm_wday],tm->tm_hour, tm->tm_min, tm->tm_sec);
+
+  int hour =(t / 3600 + 9) % 24;
+  Serial.println(hour);
+  int min =t / 60 % 60;
+  Serial.println(min);
+  int sec =t % 60;
+  Serial.println(sec);
 */
 
   /*PWM制御*/
@@ -189,12 +211,30 @@ void loop() {
   bme_get();
 
 
+  //DS18B20(1-Wire)
+  //Serial.print("Requesting temperatures...");
+  sensors.requestTemperatures(); // Send the command to get temperatures
+  //Serial.println("DONE");
+  //Serial.print("Sensor 1(*C): ");  Serial.println(sensors.getTempC(sensor1));
+  temp1 = sensors.getTempC(sensor1);
+  //Serial.print("Sensor 2(*C): ");  Serial.println(sensors.getTempC(sensor2));
+  temp2 = sensors.getTempC(sensor2);
+  //Serial.print("Sensor 3(*C): ");  Serial.println(sensors.getTempC(sensor3));
+  temp3 = sensors.getTempC(sensor3);
+  //Serial.print("Sensor 4(*C): ");  Serial.println(sensors.getTempC(sensor4));
+  temp4 = sensors.getTempC(sensor4);
+
   /*ボリューム*/
   // read the input on analog pin 0:
-  int sensorValue = analogRead(A0)/32;
+  int sensorValue = analogRead(A0)/320;
   // print out the value you read:
   Serial.println(sensorValue);
-
+  //256=20*12.8
+  if (sensorValue < 1) {
+    BRT=1;
+  }else{
+  BRT=sensorValue;
+  }
 
   /*NeoPixel*/
   //NeoPixelBus
@@ -216,35 +256,18 @@ void loop() {
 
 
   //
-  if(RRGGBB == 0){
-    RR=0;GG=0;BB=5;
-    RRGGBB++;
-  }else if (RRGGBB == 1) {
-    RR=0;GG=0;BB=5;
-    RRGGBB++;
-  }else if (RRGGBB >= 2) {
-    RR=0;GG=0;BB=5;
-    RRGGBB=0;
+  if (temp1 < 20) {
+    BB=20;
+  }else if (temp1 > 40) {
+    RR=20;
+  }else{
+    BB=(40-temp1)*BRT;
+    RR=(temp1-20)*BRT;
   }
 
 
-  //DS18B20(1-Wire)
-  //Serial.print("Requesting temperatures...");
-  sensors.requestTemperatures(); // Send the command to get temperatures
-  //Serial.println("DONE");
-  //Serial.print("Sensor 1(*C): ");  Serial.println(sensors.getTempC(sensor1));
-  temp1 = sensors.getTempC(sensor1);
-  //Serial.print("Sensor 2(*C): ");  Serial.println(sensors.getTempC(sensor2));
-  temp2 = sensors.getTempC(sensor2);
-  //Serial.print("Sensor 3(*C): ");  Serial.println(sensors.getTempC(sensor3));
-  temp3 = sensors.getTempC(sensor3);
-  //Serial.print("Sensor 4(*C): ");  Serial.println(sensors.getTempC(sensor4));
-  temp4 = sensors.getTempC(sensor4);
 
-
- //Serial.println("Hello World!"); Serial.print("PWM = "); Serial.println(power);
- //Serial.println(NN);
-  Serial.println(RRGGBB);
+  //Serial.println(RRGGBB);
 
   //PHPへ送信
   //関数に値を代入して実行
@@ -326,13 +349,27 @@ void loop() {
   snprintf(temp4_c, 10, "%.2f", temp4);
   tft.drawString(temp4_c, xpos, 280, 4);
 
-//--- R -----------------------------------------------
+//--- Right -----------------------------------------------
 
-tft.setTextColor(TFT_RED, TFT_BLACK);
-xpos = 250;
-xpos += tft.drawString("Flow = ", xpos, 10, 4);
-tft.setTextColor(TFT_WHITE, TFT_BLACK);
-tft.drawString(c_flow_rate, xpos-250, 10, 4);
+  tft.setTextColor(TFT_RED, TFT_BLACK);
+  xpos = 250;
+  xpos += tft.drawString("Flow = ", xpos, 10, 4);
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  tft.drawString(c_flow_rate, xpos-250, 10, 4);
+
+
+  /*リレー制御
+  digitalWrite(Relay_1, HIGH);
+  digitalWrite(Relay_2, HIGH);
+  digitalWrite(Relay_3, HIGH);
+  digitalWrite(Relay_4, HIGH);
+  //delay(1000);
+  digitalWrite(Relay_1, LOW);
+  digitalWrite(Relay_2, LOW);
+  digitalWrite(Relay_3, LOW);
+  digitalWrite(Relay_4, LOW);
+  //delay(1000);
+  */
 
 
   //流量計
