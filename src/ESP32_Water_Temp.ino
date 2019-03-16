@@ -42,11 +42,11 @@ TFT_eSPI tft = TFT_eSPI();       // Invoke custom library
 NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PIXEL_COUNT, PIXEL_PIN);
 
 #include "FastLED.h"
-#define NUM_LEDS 8
+#define NUM_LEDS 14
 #define DATA_PIN 4
 CRGBArray<NUM_LEDS> leds;
 
-int RR=0,GG=0,BB=0,RRGGBB=0,BRT=0;
+float RR=0,GG=0,BB=0,RRGGBB=0,BRT=0;
 /*NeoPixel-------------------------------------------------------------------------*/
 
 
@@ -226,14 +226,14 @@ void loop() {
 
   /*ボリューム*/
   // read the input on analog pin 0:
-  int sensorValue = analogRead(A0)/320;
+  float sensorValue = analogRead(A0);
   // print out the value you read:
   Serial.println(sensorValue);
   //256=20*12.8
   if (sensorValue < 1) {
     BRT=1;
   }else{
-  BRT=sensorValue;
+  BRT=sensorValue/320;
   }
 
   /*NeoPixel*/
@@ -247,8 +247,12 @@ void loop() {
 
 
   /*FastLED*/
-
-  for(int i = 0; i < NUM_LEDS; i++) {
+  //リザーバ
+  for(int i = 0; i < (NUM_LEDS-8); i++) {
+    leds[i] = CRGB(RR,GG,BB);
+  }
+  //FAN
+  for(int i = 6; i < NUM_LEDS; i++) {
     leds[i] = CRGB(RR,GG,BB);
   }
 
