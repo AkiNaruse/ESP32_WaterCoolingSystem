@@ -2,6 +2,11 @@
 int Relay_1=26,Relay_2=25,Relay_3=32,Relay_4=33;
 /*リレー制御------------------------------------------------------------------------*/
 
+#define val_MIN 0
+#define val_MAX 128
+#define def_MIN 0
+#define def_MAX 4095
+
 
 /*PWM制御--------------------------------------------------------------------------*/
 static uint8_t power = 240 ,FAN1_p = 0, FAN2_p = 0;
@@ -46,7 +51,7 @@ NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PIXEL_COUNT, PIXEL_PIN);
 #define DATA_PIN 4
 CRGBArray<NUM_LEDS> leds;
 
-float RR=0,GG=0,BB=0,RRGGBB=0,BRT=0;
+double RR=0,GG=0,BB=0,RRGGBB=0,BRT=0;
 /*NeoPixel-------------------------------------------------------------------------*/
 
 
@@ -204,6 +209,7 @@ void loop() {
     FAN2_p += diff;
     */
   ledcWrite(2, power);
+  Serial.print("FAN2_p = ");
   Serial.println(FAN2_p);
 
 
@@ -226,15 +232,28 @@ void loop() {
 
   /*ボリューム*/
   // read the input on analog pin 0:
-  float sensorValue = analogRead(A0);
-  // print out the value you read:
-  Serial.println(sensorValue);
+  double sensorValue = analogRead(A0);
+  sensorValue = map(sensorValue, def_MIN, def_MAX, val_MIN, val_MAX);
+  BRT=(double)sensorValue/(double)10;
   //256=20*12.8
-  if (sensorValue < 1) {
-    BRT=1;
+  if (BRT < 1) {BRT=1;}
+  // print out the value you read:
+  Serial.print("sensorValue = ");
+  Serial.println(sensorValue);
+  Serial.print("BRT = ");
+  Serial.println(BRT);
+
+
+  //
+  if (temp1 < 20) {
+    BB=(20*BRT)-1;
+  }else if (temp1 > 40) {
+    RR=(20*BRT)-1;
   }else{
-  BRT=sensorValue/320;
+    BB=((40-temp1)*BRT)-1;
+    RR=((temp1-20)*BRT)-1;
   }
+
 
   /*NeoPixel*/
   //NeoPixelBus
@@ -258,38 +277,26 @@ void loop() {
 
   FastLED.show();
 
-
-  //
-  if (temp1 < 20) {
-    BB=20;
-  }else if (temp1 > 40) {
-    RR=20;
-  }else{
-    BB=(40-temp1)*BRT;
-    RR=(temp1-20)*BRT;
-  }
-
-
-
   //Serial.println(RRGGBB);
 
   //PHPへ送信
   //関数に値を代入して実行
   connectServer(temp1,temp2,temp3,temp4,temperature,humidity,pressure,flow_rate);
+  Serial.println("temp1 |temp2 |temp3 |temp4 |tempe | hum  | press  |flow_r |");
   Serial.print(sensors.getTempC(sensor1));
-  Serial.print(",");
+  Serial.print(" |");
   Serial.print(sensors.getTempC(sensor2));
-  Serial.print(",");
+  Serial.print(" |");
   Serial.print(sensors.getTempC(sensor3));
-  Serial.print(",");
+  Serial.print(" |");
   Serial.print(sensors.getTempC(sensor4));
-  Serial.print(",");
+  Serial.print(" |");
   Serial.print(temp_c);
-  Serial.print(",");
+  Serial.print(" |");
   Serial.print(hum_c);
-  Serial.print(",");
+  Serial.print(" |");
   Serial.print(pres_c);
-  Serial.print(",");
+  Serial.print(" |");
   Serial.println(flow_rate);
 
 
@@ -362,18 +369,22 @@ void loop() {
   tft.drawString(c_flow_rate, xpos-250, 10, 4);
 
 
-  /*リレー制御
-  digitalWrite(Relay_1, HIGH);
-  digitalWrite(Relay_2, HIGH);
-  digitalWrite(Relay_3, HIGH);
-  digitalWrite(Relay_4, HIGH);
+  /*リレー制御*/
+  //digitalWrite(Relay_1, HIGH);
+  if (temp1 < 20) {
+    digitalWrite(Relay_2, LOW);
+  }else{
+    digitalWrite(Relay_2, HIGH);
+  }
+
+  //digitalWrite(Relay_3, HIGH);
+  //digitalWrite(Relay_4, HIGH);
   //delay(1000);
-  digitalWrite(Relay_1, LOW);
-  digitalWrite(Relay_2, LOW);
-  digitalWrite(Relay_3, LOW);
-  digitalWrite(Relay_4, LOW);
+  //digitalWrite(Relay_1, LOW);
+  //digitalWrite(Relay_3, LOW);
+  //digitalWrite(Relay_4, LOW);
   //delay(1000);
-  */
+
 
 
   //流量計
@@ -410,7 +421,8 @@ void bme_get(){
   sprintf(hum_c, "%2.2lf", humidity);
   sprintf(pres_c, "%4.2lf", pressure);
 
-  Serial.println(temperature);
+  //Serial.print("BME280_temperature = ");
+  //Serial.println(temperature);
 
 /*
   Serial.println("-----------------------");
