@@ -245,15 +245,22 @@ void loop() {
 
 
   //
-  if (temp1 < 20) {
+  if (temp1 <= 20) {
     BB=(20*BRT)-1;
-  }else if (temp1 > 40) {
+    RR=0;
+  }else if (temp1 >= 40) {
     RR=(20*BRT)-1;
+    BB=0;
   }else{
+    BB=0;
+    RR=0;
     BB=((40-temp1)*BRT)-1;
     RR=((temp1-20)*BRT)-1;
   }
-
+  Serial.print("BB = ");
+  Serial.println(BB);
+  Serial.print("RR = ");
+  Serial.println(RR);
 
   /*NeoPixel*/
   //NeoPixelBus
@@ -371,7 +378,7 @@ void loop() {
 
   /*リレー制御*/
   //digitalWrite(Relay_1, HIGH);
-  if (temp1 < 20) {
+  if (temp1 <= 20) {
     digitalWrite(Relay_2, LOW);
   }else{
     digitalWrite(Relay_2, HIGH);
