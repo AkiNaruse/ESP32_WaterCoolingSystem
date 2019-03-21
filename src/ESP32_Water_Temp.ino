@@ -1,18 +1,21 @@
 /*リレー制御------------------------------------------------------------------------*/
 int Relay_1=26,Relay_2=25,Relay_3=32,Relay_4=33;
+int td=0,td2=0;//リレー温度判断
 /*リレー制御------------------------------------------------------------------------*/
 
+
+/*ボリューム制御------------------------------------------------------------------------*/
 #define val_MIN 0
 #define val_MAX 128
 #define def_MIN 0
 #define def_MAX 4095
+/*ボリューム制御------------------------------------------------------------------------*/
 
 
 /*PWM制御--------------------------------------------------------------------------*/
 static uint8_t power = 240 ,FAN1_p = 0, FAN2_p = 0;
 static int diff = 5;
 const int FAN1Pin = 27 ,FAN2Pin = 14 ,PumpPin = 12;
-
 /*PWM制御--------------------------------------------------------------------------*/
 
 
@@ -22,8 +25,8 @@ int rotate_value,rotate_value_before;
 float flow_sum,flow_rate;
 char c_flow_rate[6];
 int ir_port = 39;
-
 /*流量計----------------------------------------------------------------------------*/
+
 
 /*BME280　室内温・気圧--------------------------------------------------------------*/
 #include <ESP32_BME280_I2C.h>
@@ -115,7 +118,7 @@ void setup() {
   Serial.println();
   Serial.printf("Connected, IP address: ");
   Serial.println(WiFi.localIP());
-
+*/
 /*NTP----------------------------------------*/
   //configTime( JST, 0, "ntp.nict.jp", "ntp.jst.mfeed.ad.jp");
 
@@ -209,8 +212,8 @@ void loop() {
     FAN2_p += diff;
     */
   ledcWrite(2, power);
-  Serial.print("FAN2_p = ");
-  Serial.println(FAN2_p);
+  //Serial.print("FAN2_p = ");
+  //Serial.println(FAN2_p);
 
 
   /*BME280*/
@@ -244,18 +247,18 @@ void loop() {
   Serial.println(BRT);
 
 
-  //
+  //LED配色設定
   if (temp1 <= 20) {
     BB=(20*BRT)-1;
     RR=0;
-  }else if (temp1 >= 40) {
+  }else if (temp1 >= 35) {
     RR=(20*BRT)-1;
     BB=0;
   }else{
     BB=0;
     RR=0;
-    BB=((40-temp1)*BRT)-1;
-    RR=((temp1-20)*BRT)-1;
+    BB=((35-temp1)*1.33)*BRT;
+    RR=((temp1-20)*1.33)*BRT;
   }
   Serial.print("BB = ");
   Serial.println(BB);
@@ -376,24 +379,73 @@ void loop() {
   tft.drawString(c_flow_rate, xpos-250, 10, 4);
 
 
-  /*リレー制御*/
-  //digitalWrite(Relay_1, HIGH);
-  if (temp1 <= 20) {
-    digitalWrite(Relay_2, LOW);
-  }else{
-    digitalWrite(Relay_2, HIGH);
+  /*リレー制御_温度判断*/
+  if(td > 0){
+    if(temp1 > 35){//35度以上
+      //FAN
+      digitalWrite(Relay_1,LOW);//FAN1_ON
+      digitalWrite(Relay_2,HIGH);//FAN2_ON
+      digitalWrite(Relay_3,HIGH);//Pump_ON
+      digitalWrite(Relay_4,HIGH);//FAN_OUT_ON
+      FAN1_p = 127;
+      FAN2_p = 255;
+    }
+    //温度ディレイタイムディクリメント
+    td--;
+  }else if(temp1 < 20){//20度以下
+    digitalWrite(Relay_1,HIGH);//FAN1_OFF
+    digitalWrite(Relay_2,LOW);//FAN2_OFF
+    digitalWrite(Relay_3,HIGH);//Pump_ON
+    digitalWrite(Relay_4,HIGH);//FAN_OUT_ON
+    FAN1_p = 0;
+    FAN2_p = 0;
+  }else if(temp1 > 25 && temp1 < 30){//25度以上かつ30度以下
+    digitalWrite(Relay_1,HIGH);//FAN1_OFF
+    digitalWrite(Relay_2,HIGH);//FAN2_ON
+    digitalWrite(Relay_3,HIGH);//Pump_ON
+    digitalWrite(Relay_4,HIGH);//FAN_OUT_ON
+    FAN1_p = 0;
+    FAN2_p = 0;
+    //温度ディレイタイムインクリメント
+    td=600;
+  }else if(temp1 > 30 && temp1 < 35){//30度以上かつ35度以下
+    digitalWrite(Relay_1,HIGH);//FAN1_OFF
+    digitalWrite(Relay_2,HIGH);//FAN2_ON
+    digitalWrite(Relay_3,HIGH);//Pump_ON
+    digitalWrite(Relay_4,HIGH);//FAN_OUT_ON
+    FAN1_p = 0;
+    FAN2_p = 127;
+    //温度ディレイタイムインクリメント
+    td=600;
+  }else if(temp1 > 35){//35度以上
+    digitalWrite(Relay_1,LOW);//FAN1_ON
+    digitalWrite(Relay_2,HIGH);//FAN2_ON
+    digitalWrite(Relay_3,HIGH);//Pump_ON
+    digitalWrite(Relay_4,HIGH);//FAN_OUT_ON
+    FAN1_p = 127;
+    FAN2_p = 255;
+    //温度ディレイタイムインクリメント
+    td=600;
   }
-
-  //digitalWrite(Relay_3, HIGH);
-  //digitalWrite(Relay_4, HIGH);
-  //delay(1000);
-  //digitalWrite(Relay_1, LOW);
-  //digitalWrite(Relay_3, LOW);
-  //digitalWrite(Relay_4, LOW);
-  //delay(1000);
-
-
-
+/*
+   if(td2 > 0){
+    td2--;
+   }else if(temp_act > celsius){
+     //リレー3 OFF
+     digitalWrite(relay_2,HIGH);
+     //リレー4 OFF
+     digitalWrite(relay_3,HIGH);
+     Fan2=1;
+     td2=3000;
+   }else if(temp_act < celsius){
+     //リレー3 ON
+     digitalWrite(relay_2,LOW);
+     //リレー4 ON
+     digitalWrite(relay_3,LOW);
+     Fan2=2;
+     td2=3000;
+   }
+*/
   //流量計
   rotate_value_before=num_pulse;
 
