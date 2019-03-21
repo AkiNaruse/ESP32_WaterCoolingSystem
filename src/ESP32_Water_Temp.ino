@@ -392,7 +392,7 @@ void loop() {
     }
     //温度ディレイタイムディクリメント
     td--;
-  }else if(temp1 < 20){//20度以下
+  }else if(temp1 < 25){//25度以下
     digitalWrite(Relay_1,HIGH);//FAN1_OFF
     digitalWrite(Relay_2,LOW);//FAN2_OFF
     digitalWrite(Relay_3,HIGH);//Pump_ON
