@@ -87,12 +87,21 @@ DeviceAddress sensor5 = { 0x28, 0xFF, 0x36, 0x46, 0x69, 0x14, 0x4, 0x24 };
 
 const char *ssid = "";
 const char *password = "";
-const char* server = "";
+const char* server_url = "";
+IPAddress ip(1, 1, 1, 1);           // for fixed IP Address
+IPAddress gateway(1, 1, 1, 1);        //
+IPAddress subnet(255, 255, 255, 0);      //
+IPAddress DNS(129, 250, 35, 250);          //
 
 
+WiFiServer server(80);
 WiFiClient client;
+
 //関数の宣言
 void connectServer(float,float,float,float,float,float,float,float);
+void httpServer(float,float,float,float,float,float,float,float);
+
+int value = 0;
 /*WiFi-----------------------------------------------------------------------------*/
 
 
@@ -107,7 +116,9 @@ void setup() {
  /*シリアル初期化-----------------------------*/
   Serial.begin(115200);
 
-/*WiFi---------------------------------------
+/*WiFi---------------------------------------*/
+  WiFi.config(ip, gateway, subnet, DNS);   // Set fixed IP address
+
   Serial.print("\n\nStart\n");
 
   WiFi.begin(ssid, password);
@@ -118,9 +129,13 @@ void setup() {
   Serial.println();
   Serial.printf("Connected, IP address: ");
   Serial.println(WiFi.localIP());
-*/
+
+  //
+  server.begin();
+
+
 /*NTP----------------------------------------*/
-  //configTime( JST, 0, "ntp.nict.jp", "ntp.jst.mfeed.ad.jp");
+  configTime( JST, 0, "ntp.nict.jp", "ntp.jst.mfeed.ad.jp");
 
 
  /*NeoPixel----------------------------------*/
@@ -183,7 +198,7 @@ void setup() {
 
 void loop() {
 
-  /*NTP
+  /*NTP*/
   time_t t;
   struct tm *tm;
   static const char *wd[7] = {"Sun","Mon","Tue","Wed","Thr","Fri","Sat"};
@@ -198,7 +213,7 @@ void loop() {
   Serial.println(min);
   int sec =t % 60;
   Serial.println(sec);
-*/
+
 
   /*PWM制御*/
   ledcWrite(0, FAN1_p);
@@ -291,7 +306,7 @@ void loop() {
 
   //PHPへ送信
   //関数に値を代入して実行
-  connectServer(temp1,temp2,temp3,temp4,temperature,humidity,pressure,flow_rate);
+  //connectServer(temp1,temp2,temp3,temp4,temperature,humidity,pressure,flow_rate);
   Serial.println("temp1 |temp2 |temp3 |temp4 |tempe | hum  | press  |flow_r |");
   Serial.print(sensors.getTempC(sensor1));
   Serial.print(" |");
@@ -308,6 +323,10 @@ void loop() {
   Serial.print(pres_c);
   Serial.print(" |");
   Serial.println(flow_rate);
+
+
+  //
+  httpServer(temp1,temp2,temp3,temp4,temperature,humidity,pressure,flow_rate);
 
 
   /*TFT_eSPI*/
@@ -497,29 +516,90 @@ void bme_get(){
 /************** PHPへ送信 *************************/
 //サーバーに接続し値を送る
 void connectServer(float t1,float t2,float  t3,float t4,float t5, float h,float p, float f) {
-  if(client.connect(server, 80)){
-    Serial.println("connected to server");
-    // 指定のwebサーバのPHPスクリプトにGET送信
-    client.print("GET /monitor/receive.php?temp0=");
-    client.print(t1);
-    client.print("&temp1=");
-    client.print(t2);
-    client.print("&temp2=");
-    client.print(t3);
-    client.print("&temp3=");
-    client.print(t4);
-    client.print("&temp4=");
-    client.print(t5);
-    client.print("&Humi=");
-    client.print(h);
-    client.print("&APress=");
-    client.print(p);
-    client.print("&Flow=");
-    client.print(f);
-    client.print(" HTTP/1.1\r\n");
-    client.print("HOST: ");
-    client.println(server);
-    client.println("Connection: close");
-    client.println();
+  if (t1 < 50 && t2 < 50 && t3 < 50 && t4 < 50 && t5 < 50 && t1 > -10 && t2 > -10 && t3 > -10 && t4 > -10 && t5 > -10) {
+    if(client.connect(server_url, 80)){
+      Serial.println("connected to server");
+      // 指定のwebサーバのPHPスクリプトにGET送信
+      client.print("GET /monitor/receive.php?temp0=");
+      client.print(t1);
+      client.print("&temp1=");
+      client.print(t2);
+      client.print("&temp2=");
+      client.print(t3);
+      client.print("&temp3=");
+      client.print(t4);
+      client.print("&temp4=");
+      client.print(t5);
+      client.print("&Humi=");
+      client.print(h);
+      client.print("&APress=");
+      client.print(p);
+      client.print("&Flow=");
+      client.print(f);
+      client.print(" HTTP/1.1\r\n");
+      client.print("HOST: ");
+      client.println(server_url);
+      client.println("Connection: close");
+      client.println();
+    }
+  }
+}
+
+void httpServer(float t1,float t2,float  t3,float t4,float t5, float h,float p, float f) {
+  WiFiClient client = server.available();
+  if (client) {
+    String blank_line = "";
+    while (client.connected()) {
+      if (client.available()) {
+        char c = client.read();
+//        Serial.print(c);
+        if (c == '\n') {
+          if (blank_line.length() == 0) {
+            client.println("HTTP/1.1 200 OK");
+            client.println("Content-Type: text/html; charset=utf-8;");
+            client.println();
+
+            client.println("<!DOCTYPE HTML>");
+            client.println("<html>");
+            client.println("<head><meta http-equiv=\"refresh\" content=\"60\"></head>");
+            client.println("<body>");
+            client.println("ESP32 - 温湿度センサ<br>");
+            client.println("温度1: ");
+            client.print(t1);
+            client.println("度 <br>");
+            client.println("温度2: ");
+            client.print(t2);
+            client.println("度 <br>");
+            client.println("温度3: ");
+            client.print(t3);
+            client.println("度 <br>");
+            client.println("温度4: ");
+            client.print(t4);
+            client.println("度 <br>");
+            client.println("温度5: ");
+            client.print(t5);
+            client.println("度 <br>");
+            client.println("湿度: ");
+            client.print(h);
+            client.println("％ <br>");
+            client.println("気圧: ");
+            client.print(p);
+            client.println("hPa <br>");
+            client.println("流量: ");
+            client.print(f);
+            client.println("h/L <br>");
+            client.println("</body>");
+            client.println("</html>");
+            client.println();
+            break;
+          } else {
+            blank_line = "";
+          }
+        } else if (c != '\r') {
+          blank_line += c;
+        }
+      }
+    }
+    client.stop();
   }
 }
