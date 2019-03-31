@@ -137,16 +137,16 @@
       <td align="center">---</td>
     </tr>
     <tr>
-      <td align="center"></td>
+      <td align="center">ボタン２</td>
       <td align="center">34</td>
       <td align="center">3</td>
       <td align="center">---</td>
     </tr>
     <tr>
-      <td align="center"></td>
+      <td align="center">ボタン１</td>
       <td align="center">35</td>
       <td align="center">21</td>
-      <td align="center"></td>
+      <td align="center">リレー６</td>
     </tr>
     <tr>
       <td align="center">リレー4</td>
@@ -206,7 +206,7 @@
       <td align="center">---</td>
       <td align="center">9</td>
       <td align="center">15</td>
-      <td align="center"></td>
+      <td align="center">リレー５</td>
     </tr>
     <tr>
       <td align="center">---</td>

@@ -1,5 +1,5 @@
 /*リレー制御------------------------------------------------------------------------*/
-int Relay_1=26,Relay_2=25,Relay_3=32,Relay_4=33;
+int Relay_1=26,Relay_2=25,Relay_3=32,Relay_4=33,Relay_5=15,Relay_6=21;
 int td=0,td2=0;//リレー温度判断
 /*リレー制御------------------------------------------------------------------------*/
 
@@ -68,6 +68,8 @@ double RR=0,GG=0,BB=0,RRGGBB=0,BRT=0;
 OneWire oneWire(ONE_WIRE_BUS);
 // Pass our oneWire reference to Dallas Temperature sensor
 DallasTemperature sensors(&oneWire);
+
+#define SENSER_BIT    10      // 精度の設定bit
 
 char temp1_c[10], temp2_c[10], temp3_c[10], temp4_c[10];
 float temp1, temp2, temp3, temp4;
@@ -167,6 +169,9 @@ void setup() {
   tft.fillScreen(TFT_BLACK);
 
 
+  /*DS18B20(1-Wire)--------------------------*/
+  sensors.setResolution(SENSER_BIT);
+
   /*BME280-----------------------------------*/
   //delay(1000); //Take some time to open up the Serial Monitor
   uint8_t t_sb = 0; //stanby 0.5ms
@@ -186,11 +191,14 @@ void setup() {
   pinMode(Relay_2, OUTPUT);
   pinMode(Relay_3, OUTPUT);
   pinMode(Relay_4, OUTPUT);
+  pinMode(Relay_5, OUTPUT);
+  pinMode(Relay_6, OUTPUT);
   digitalWrite(Relay_1, HIGH);
   digitalWrite(Relay_2, HIGH);
   digitalWrite(Relay_3, HIGH);
   digitalWrite(Relay_4, HIGH);
-
+  digitalWrite(Relay_5, HIGH);
+  digitalWrite(Relay_6, HIGH);
   //delay(1000);
 
 }
@@ -306,7 +314,6 @@ void loop() {
 
   //PHPへ送信
   //関数に値を代入して実行
-  //connectServer(temp1,temp2,temp3,temp4,temperature,humidity,pressure,flow_rate);
   Serial.println("temp1 |temp2 |temp3 |temp4 |tempe | hum  | press  |flow_r |");
   Serial.print(sensors.getTempC(sensor1));
   Serial.print(" |");
@@ -324,7 +331,8 @@ void loop() {
   Serial.print(" |");
   Serial.println(flow_rate);
 
-
+  //
+  connectServer(temp1,temp2,temp3,temp4,temperature,humidity,pressure,flow_rate);
   //
   httpServer(temp1,temp2,temp3,temp4,temperature,humidity,pressure,flow_rate);
 
@@ -515,27 +523,27 @@ void bme_get(){
 
 /************** PHPへ送信 *************************/
 //サーバーに接続し値を送る
-void connectServer(float t1,float t2,float  t3,float t4,float t5, float h,float p, float f) {
-  if (t1 < 50 && t2 < 50 && t3 < 50 && t4 < 50 && t5 < 50 && t1 > -10 && t2 > -10 && t3 > -10 && t4 > -10 && t5 > -10) {
+void connectServer(float ct1,float ct2,float  ct3,float ct4,float ct5, float ch,float cp, float cf) {
+  if (ct1 < 50 && ct2 < 50 && ct3 < 50 && ct4 < 50 && ct5 < 50 && ct1 > -10 && ct2 > -10 && ct3 > -10 && ct4 > -10 && ct5 > -10) {
     if(client.connect(server_url, 80)){
       Serial.println("connected to server");
       // 指定のwebサーバのPHPスクリプトにGET送信
       client.print("GET /monitor/receive.php?temp0=");
-      client.print(t1);
+      client.print(ct1);
       client.print("&temp1=");
-      client.print(t2);
+      client.print(ct2);
       client.print("&temp2=");
-      client.print(t3);
+      client.print(ct3);
       client.print("&temp3=");
-      client.print(t4);
+      client.print(ct4);
       client.print("&temp4=");
-      client.print(t5);
+      client.print(ct5);
       client.print("&Humi=");
-      client.print(h);
+      client.print(ch);
       client.print("&APress=");
-      client.print(p);
+      client.print(cp);
       client.print("&Flow=");
-      client.print(f);
+      client.print(cf);
       client.print(" HTTP/1.1\r\n");
       client.print("HOST: ");
       client.println(server_url);
@@ -545,7 +553,7 @@ void connectServer(float t1,float t2,float  t3,float t4,float t5, float h,float 
   }
 }
 
-void httpServer(float t1,float t2,float  t3,float t4,float t5, float h,float p, float f) {
+void httpServer(float ht1,float ht2,float  ht3,float ht4,float ht5, float hh,float hp, float hf) {
   WiFiClient client = server.available();
   if (client) {
     String blank_line = "";
@@ -565,28 +573,28 @@ void httpServer(float t1,float t2,float  t3,float t4,float t5, float h,float p, 
             client.println("<body>");
             client.println("ESP32 - 温湿度センサ<br>");
             client.println("温度1: ");
-            client.print(t1);
+            client.print(ht1);
             client.println("度 <br>");
             client.println("温度2: ");
-            client.print(t2);
+            client.print(ht2);
             client.println("度 <br>");
             client.println("温度3: ");
-            client.print(t3);
+            client.print(ht3);
             client.println("度 <br>");
             client.println("温度4: ");
-            client.print(t4);
+            client.print(ht4);
             client.println("度 <br>");
             client.println("温度5: ");
-            client.print(t5);
+            client.print(ht5);
             client.println("度 <br>");
             client.println("湿度: ");
-            client.print(h);
+            client.print(hh);
             client.println("％ <br>");
             client.println("気圧: ");
-            client.print(p);
+            client.print(hp);
             client.println("hPa <br>");
             client.println("流量: ");
-            client.print(f);
+            client.print(hf);
             client.println("h/L <br>");
             client.println("</body>");
             client.println("</html>");
