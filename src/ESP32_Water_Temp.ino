@@ -12,6 +12,20 @@ int td=0,td2=0;//リレー温度判断
 /*ボリューム制御------------------------------------------------------------------------*/
 
 
+/*ボタン制御------------------------------------------------------------------------*/
+#include <EasyButton.h>
+
+// Arduino pin where the buttons are connected to
+#define BUTTON_ONE_PIN 35
+#define BUTTON_TWO_PIN 34
+
+// Button1
+EasyButton button1(BUTTON_ONE_PIN);
+// Button2
+EasyButton button2(BUTTON_TWO_PIN);
+/*ボタン制御------------------------------------------------------------------------*/
+
+
 /*PWM制御--------------------------------------------------------------------------*/
 static uint8_t power = 240 ,FAN1_p = 0, FAN2_p = 0;
 static int diff = 5;
@@ -54,7 +68,7 @@ NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PIXEL_COUNT, PIXEL_PIN);
 #define DATA_PIN 4
 CRGBArray<NUM_LEDS> leds;
 
-double RR=0,GG=0,BB=0,RRGGBB=0,BRT=0;
+double RR=0,GG=0,BB=0,RRGGBB=0,BRT=1;
 /*NeoPixel-------------------------------------------------------------------------*/
 
 
@@ -72,7 +86,7 @@ DallasTemperature sensors(&oneWire);
 #define SENSER_BIT    10      // 精度の設定bit
 
 char temp1_c[10], temp2_c[10], temp3_c[10], temp4_c[10];
-float temp1, temp2, temp3, temp4;
+float temp1, temp2, temp3, temp4, wt1, wt2, wt3, wt4;
 
 DeviceAddress sensor1 = { 0x28, 0xAA, 0xDE, 0x9, 0x38, 0x14, 0x1, 0x90 };
 DeviceAddress sensor2 = { 0x28, 0xAA, 0xB5, 0xFC, 0x37, 0x14, 0x1, 0x5E };
@@ -186,6 +200,15 @@ void setup() {
   pinMode(ir_port, INPUT);
   attachInterrupt(ir_port, sum_pulse, RISING);
 
+  //ボタン制御
+  button1.begin();
+  // Initialize the button2
+  button2.begin();
+  // Add the callback function to be called when the button1 is pressed.
+  button1.onPressed(onButton1Pressed);
+  // Add the callback function to be called when the button2 is pressed.
+  button2.onPressed(onButton2Pressed);
+
   //リレー
   pinMode(Relay_1, OUTPUT);
   pinMode(Relay_2, OUTPUT);
@@ -216,11 +239,18 @@ void loop() {
   Serial.printf(" %04d/%02d/%02d(%s) %02d:%02d:%02d\n",tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday,wd[tm->tm_wday],tm->tm_hour, tm->tm_min, tm->tm_sec);
 
   int hour =(t / 3600 + 9) % 24;
-  Serial.println(hour);
+  //Serial.println(hour);
   int min =t / 60 % 60;
-  Serial.println(min);
+  //Serial.println(min);
   int sec =t % 60;
-  Serial.println(sec);
+  //Serial.println(sec);
+
+
+
+  /*ボタン--------------------------------*/
+  // Continuously read the status of the buttons
+  button1.read();
+  button2.read();
 
 
   /*PWM制御*/
@@ -249,14 +279,18 @@ void loop() {
   //Serial.println("DONE");
   //Serial.print("Sensor 1(*C): ");  Serial.println(sensors.getTempC(sensor1));
   temp1 = sensors.getTempC(sensor1);
+  wt1 = temp1;
   //Serial.print("Sensor 2(*C): ");  Serial.println(sensors.getTempC(sensor2));
   temp2 = sensors.getTempC(sensor2);
+  wt2 = temp2;
   //Serial.print("Sensor 3(*C): ");  Serial.println(sensors.getTempC(sensor3));
   temp3 = sensors.getTempC(sensor3);
+  wt3 = temp3;
   //Serial.print("Sensor 4(*C): ");  Serial.println(sensors.getTempC(sensor4));
   temp4 = sensors.getTempC(sensor4);
+  wt4 = temp4;
 
-  /*ボリューム*/
+  /*ボリューム--------------------------------
   // read the input on analog pin 0:
   double sensorValue = analogRead(A0);
   sensorValue = map(sensorValue, def_MIN, def_MAX, val_MIN, val_MAX);
@@ -266,8 +300,10 @@ void loop() {
   // print out the value you read:
   Serial.print("sensorValue = ");
   Serial.println(sensorValue);
+  */
   Serial.print("BRT = ");
   Serial.println(BRT);
+
 
 
   //LED配色設定
@@ -332,9 +368,9 @@ void loop() {
   Serial.println(flow_rate);
 
   //
-  connectServer(temp1,temp2,temp3,temp4,temperature,humidity,pressure,flow_rate);
+  connectServer(wt1,wt2,wt3,wt4,temperature,humidity,pressure,flow_rate);
   //
-  httpServer(temp1,temp2,temp3,temp4,temperature,humidity,pressure,flow_rate);
+  httpServer(wt1,wt2,wt3,wt4,temperature,humidity,pressure,flow_rate);
 
 
   /*TFT_eSPI*/
@@ -610,4 +646,19 @@ void httpServer(float ht1,float ht2,float  ht3,float ht4,float ht5, float hh,flo
     }
     client.stop();
   }
+}
+
+// Callback function to be called when button1 is pressed
+void onButton1Pressed() {
+  Serial.println("Button1 has been pressed!");
+  if (BRT > 12) {
+    BRT = BRT+2.95;
+  }else{
+    BRT = 1;
+  }
+}
+
+// Callback function to be called when button2 is pressed
+void onButton2Pressed() {
+  Serial.println("Button2 has been pressed!");
 }
