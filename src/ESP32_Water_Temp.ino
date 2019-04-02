@@ -8,11 +8,11 @@ int td=0,td2=0;//リレー温度判断
 int vol_hist[8];   //直近8回分のAD値変換値の履歴
 int vol_new;       //最新のAD変換値
 int vol_sum = 0;   //加算値格納用
-byte i_oldest = 0;    //一番古いデータが格納されている配列index
+int i_oldest = 0;    //一番古いデータが格納されている配列index
 
-byte valbk[] = {0,0,0}; // 今回,前回,前々回
-byte val = 0;    //移動平均結果
-byte channel;
+int valbk[] = {0,0,0}; // 今回,前回,前々回
+double val = 0;    //移動平均結果
+int channel;
 /*ボリューム制御------------------------------------------------------------------------*/
 
 
@@ -297,24 +297,23 @@ void loop() {
   /*ボリューム--------------------------------*/
   // 移動平均処理
   vol_new = analogRead(A0);  // A0ピンをAnalog入力とする
+  Serial.print("analogRead = ");
+  Serial.println(vol_new);
 
   vol_sum = vol_sum + vol_new;            // 合計値に最新の値を足す
   vol_sum = vol_sum - vol_hist[i_oldest]; //合計値から最古の値を引く
   vol_hist[i_oldest] = vol_new;           //最古の履歴を最新の値で上書き
   i_oldest++;                             //古いデータのインデックス値を１つ増やす
   if(i_oldest>=8){i_oldest=0;}            //配列のインデックスが範囲外なら0に戻す
-  val = (byte)(vol_sum >> 6);             //3bit右シフトで8で割るのと同義。さらに3bit右シフトで7bit精度に落ちる
+  val = vol_sum/8;             //
 
+  /*ボリューム全開との変化を比較
   if(chkchange(channel,val)){
-
-    // MIDI送信処理
-
     valbk[2] = valbk[1];  // 「前々回」を「前々前回」へ
     valbk[1] = valbk[0];  // 「前回」を「前々回」へ
     valbk[0] = val;       // 「今回」を「前回」へ
-
     //delay(10);        // 変化検知したら、少し間をあける
-  }
+  }*/
 
   Serial.print("val = ");
   Serial.println(val);
@@ -329,6 +328,11 @@ void loop() {
   Serial.print("sensorValue = ");
   Serial.println(sensorValue);
   */
+  BRT = val/320;
+  if (BRT <= 1) {
+    BRT = 1;
+  }
+
   Serial.print("BRT = ");
   Serial.println(BRT);
 
@@ -339,8 +343,8 @@ void loop() {
     BB=(20*BRT)-1;
     RR=0;
   }else if (temp1 >= 35) {
-    RR=(20*BRT)-1;
     BB=0;
+    RR=(20*BRT)-1;
   }else{
     BB=0;
     RR=0;
@@ -690,8 +694,8 @@ void onButton1Pressed() {
 void onButton2Pressed() {
   Serial.println("Button2 has been pressed!");
 }
-
-boolean chkchange(byte channel,byte val){
+/*ボリューム全開との変化を比較
+boolean chkchange(int channel,int val){
   byte chk1 = valbk[0];
   byte chk2 = valbk[1];
   byte chk3 = valbk[2];
@@ -703,3 +707,4 @@ boolean chkchange(byte channel,byte val){
   }
   return false;
 }
+*/
