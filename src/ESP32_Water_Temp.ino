@@ -5,10 +5,14 @@ int td=0,td2=0;//リレー温度判断
 
 
 /*ボリューム制御------------------------------------------------------------------------*/
-#define val_MIN 0
-#define val_MAX 128
-#define def_MIN 0
-#define def_MAX 4095
+int vol_hist[8];   //直近8回分のAD値変換値の履歴
+int vol_new;       //最新のAD変換値
+int vol_sum = 0;   //加算値格納用
+byte i_oldest = 0;    //一番古いデータが格納されている配列index
+
+byte valbk[] = {0,0,0}; // 今回,前回,前々回
+byte val = 0;    //移動平均結果
+byte channel;
 /*ボリューム制御------------------------------------------------------------------------*/
 
 
@@ -290,7 +294,31 @@ void loop() {
   temp4 = sensors.getTempC(sensor4);
   wt4 = temp4;
 
-  /*ボリューム--------------------------------
+  /*ボリューム--------------------------------*/
+  // 移動平均処理
+  vol_new = analogRead(A0);  // A0ピンをAnalog入力とする
+
+  vol_sum = vol_sum + vol_new;            // 合計値に最新の値を足す
+  vol_sum = vol_sum - vol_hist[i_oldest]; //合計値から最古の値を引く
+  vol_hist[i_oldest] = vol_new;           //最古の履歴を最新の値で上書き
+  i_oldest++;                             //古いデータのインデックス値を１つ増やす
+  if(i_oldest>=8){i_oldest=0;}            //配列のインデックスが範囲外なら0に戻す
+  val = (byte)(vol_sum >> 6);             //3bit右シフトで8で割るのと同義。さらに3bit右シフトで7bit精度に落ちる
+
+  if(chkchange(channel,val)){
+
+    // MIDI送信処理
+
+    valbk[2] = valbk[1];  // 「前々回」を「前々前回」へ
+    valbk[1] = valbk[0];  // 「前回」を「前々回」へ
+    valbk[0] = val;       // 「今回」を「前回」へ
+
+    //delay(10);        // 変化検知したら、少し間をあける
+  }
+
+  Serial.print("val = ");
+  Serial.println(val);
+  /*
   // read the input on analog pin 0:
   double sensorValue = analogRead(A0);
   sensorValue = map(sensorValue, def_MIN, def_MAX, val_MIN, val_MAX);
@@ -661,4 +689,17 @@ void onButton1Pressed() {
 // Callback function to be called when button2 is pressed
 void onButton2Pressed() {
   Serial.println("Button2 has been pressed!");
+}
+
+boolean chkchange(byte channel,byte val){
+  byte chk1 = valbk[0];
+  byte chk2 = valbk[1];
+  byte chk3 = valbk[2];
+  if((val != chk1)&&(val != chk2)&&(val != chk3)&&(chk1 != chk3)){
+    return true;
+  }
+  if((val != chk1)&&(chk1 == chk2)&&(chk1 == chk3)&&(chk1 == 0)){
+    return true;
+  }
+  return false;
 }
