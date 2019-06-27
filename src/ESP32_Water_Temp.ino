@@ -108,10 +108,10 @@ DeviceAddress sensor5 = { 0x28, 0xFF, 0x36, 0x46, 0x69, 0x14, 0x4, 0x24 };
 const char *ssid = "";
 const char *password = "";
 const char* server_url = "";
-IPAddress ip(1, 1, 1, 1);           // for fixed IP Address
-IPAddress gateway(1, 1, 1, 1);        //
 IPAddress subnet(255, 255, 255, 0);      //
 IPAddress DNS(129, 250, 35, 250);          //
+IPAddress ip(1, 1, 1, 1);           // for fixed IP Address
+IPAddress gateway(1, 1, 1, 1);        //
 
 
 WiFiServer server(80);
@@ -328,10 +328,26 @@ void loop() {
   Serial.print("sensorValue = ");
   Serial.println(sensorValue);
   */
-  BRT = val/320;
-  if (BRT <= 1) {
-    BRT = 1;
+
+
+  //hour
+  if (hour >= 18 ) {
+    //LED ON
+    BRT = val/320;
+    if (BRT <= 1) {
+      BRT = 1;
+    }
+  }else if(hour <= 2 ){
+    //LED ON
+    BRT = val/320;
+    if (BRT <= 1) {
+      BRT = 1;
+    }
+  }else{
+    //LED OFF
+    BRT = 0;
   }
+
 
   Serial.print("BRT = ");
   Serial.println(BRT);
@@ -480,8 +496,6 @@ void loop() {
       //FAN
       digitalWrite(Relay_1,LOW);//FAN1_ON
       digitalWrite(Relay_2,HIGH);//FAN2_ON
-      digitalWrite(Relay_3,HIGH);//Pump_ON
-      digitalWrite(Relay_4,HIGH);//FAN_OUT_ON
       FAN1_p = 127;
       FAN2_p = 255;
     }
@@ -490,15 +504,11 @@ void loop() {
   }else if(temp1 < 25){//25度以下
     digitalWrite(Relay_1,HIGH);//FAN1_OFF
     digitalWrite(Relay_2,LOW);//FAN2_OFF
-    digitalWrite(Relay_3,HIGH);//Pump_ON
-    digitalWrite(Relay_4,HIGH);//FAN_OUT_ON
     FAN1_p = 0;
     FAN2_p = 0;
   }else if(temp1 > 25 && temp1 < 30){//25度以上かつ30度以下
     digitalWrite(Relay_1,HIGH);//FAN1_OFF
     digitalWrite(Relay_2,HIGH);//FAN2_ON
-    digitalWrite(Relay_3,HIGH);//Pump_ON
-    digitalWrite(Relay_4,HIGH);//FAN_OUT_ON
     FAN1_p = 0;
     FAN2_p = 0;
     //温度ディレイタイムインクリメント
@@ -506,8 +516,6 @@ void loop() {
   }else if(temp1 > 30 && temp1 < 35){//30度以上かつ35度以下
     digitalWrite(Relay_1,HIGH);//FAN1_OFF
     digitalWrite(Relay_2,HIGH);//FAN2_ON
-    digitalWrite(Relay_3,HIGH);//Pump_ON
-    digitalWrite(Relay_4,HIGH);//FAN_OUT_ON
     FAN1_p = 0;
     FAN2_p = 127;
     //温度ディレイタイムインクリメント
@@ -515,32 +523,47 @@ void loop() {
   }else if(temp1 > 35){//35度以上
     digitalWrite(Relay_1,LOW);//FAN1_ON
     digitalWrite(Relay_2,HIGH);//FAN2_ON
-    digitalWrite(Relay_3,HIGH);//Pump_ON
-    digitalWrite(Relay_4,HIGH);//FAN_OUT_ON
     FAN1_p = 127;
     FAN2_p = 255;
     //温度ディレイタイムインクリメント
     td=600;
   }
-/*
-   if(td2 > 0){
-    td2--;
-   }else if(temp_act > celsius){
-     //リレー3 OFF
-     digitalWrite(relay_2,HIGH);
-     //リレー4 OFF
-     digitalWrite(relay_3,HIGH);
-     Fan2=1;
-     td2=3000;
-   }else if(temp_act < celsius){
-     //リレー3 ON
-     digitalWrite(relay_2,LOW);
-     //リレー4 ON
-     digitalWrite(relay_3,LOW);
-     Fan2=2;
-     td2=3000;
-   }
-*/
+
+
+  //hour
+  if (hour >= 18 ) {
+    //リレー6 ON
+    digitalWrite(Relay_6, HIGH);
+  }else if(hour <= 2 ){
+    //リレー6 ON
+    digitalWrite(Relay_6, HIGH);
+  }else{
+    //リレー6 OFF
+    digitalWrite(Relay_6, LOW);
+  }
+
+  if (td2 <= 0) {
+    //Outside temp4 temp_c
+    if (temp4 >= temperature) {
+      //リレー3-4 OFF
+      digitalWrite(Relay_3,HIGH);//Pump_ON
+      digitalWrite(Relay_4,HIGH);//FAN_OUT_ON
+      //温度ディレイタイムインクリメント
+      td2=600;
+    }else{
+      //リレー3-4 ON
+      digitalWrite(Relay_3,LOW);//Pump_OFF
+      digitalWrite(Relay_4,LOW);//FAN_OUT_OFF
+    }
+  }else{
+    //リレー3-4 OFF
+    digitalWrite(Relay_3,HIGH);//Pump_ON
+    digitalWrite(Relay_4,HIGH);//FAN_OUT_ON
+    //温度ディレイタイムディクリメント
+    td--;
+  }
+
+
   //流量計
   rotate_value_before=num_pulse;
 
