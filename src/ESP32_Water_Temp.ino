@@ -89,8 +89,8 @@ DallasTemperature sensors(&oneWire);
 
 #define SENSER_BIT    10      // 精度の設定bit
 
-char temp1_c[10], temp2_c[10], temp3_c[10], temp4_c[10];
-float temp1, temp2, temp3, temp4, wt1, wt2, wt3, wt4;
+char temp1_c[10], temp2_c[10], temp3_c[10], temp4_c[10], temp5_c[10];
+float temp1, temp2, temp3, temp4, temp5, wt1, wt2, wt3, wt4, wt5;
 
 DeviceAddress sensor1 = { 0x28, 0xAA, 0xDE, 0x9, 0x38, 0x14, 0x1, 0x90 };
 DeviceAddress sensor2 = { 0x28, 0xAA, 0xB5, 0xFC, 0x37, 0x14, 0x1, 0x5E };
@@ -293,6 +293,9 @@ void loop() {
   //Serial.print("Sensor 4(*C): ");  Serial.println(sensors.getTempC(sensor4));
   temp4 = sensors.getTempC(sensor4);
   wt4 = temp4;
+  //Serial.print("Sensor 5(*C): ");  Serial.println(sensors.getTempC(sensor5));
+  temp5 = sensors.getTempC(sensor5);
+  wt5 = temp5;
 
   /*ボリューム--------------------------------*/
   // 移動平均処理
@@ -407,7 +410,7 @@ void loop() {
   Serial.print(" |");
   Serial.print(sensors.getTempC(sensor4));
   Serial.print(" |");
-  Serial.print(temp_c);
+  Serial.print(sensors.getTempC(sensor5));
   Serial.print(" |");
   Serial.print(hum_c);
   Serial.print(" |");
@@ -416,9 +419,9 @@ void loop() {
   Serial.println(flow_rate);
 
   //
-  connectServer(wt1,wt2,wt3,wt4,temperature,humidity,pressure,flow_rate);
+  connectServer(wt1,wt2,wt3,wt4,wt5,humidity,pressure,flow_rate);
   //
-  httpServer(wt1,wt2,wt3,wt4,temperature,humidity,pressure,flow_rate);
+  httpServer(wt1,wt2,wt3,wt4,wt5,humidity,pressure,flow_rate);
 
 
   /*TFT_eSPI*/
@@ -543,17 +546,19 @@ void loop() {
   }
 
   if (td2 <= 0) {
-    //Outside temp4 temp_c
-    if (temp4 >= temperature) {
+    //Outside temp4 temp5
+    if (temp4 > temp5) {
       //リレー3-4 OFF
-      digitalWrite(Relay_3,HIGH);//Pump_ON
-      digitalWrite(Relay_4,HIGH);//FAN_OUT_ON
+      digitalWrite(Relay_3,LOW);//Pump_OFF
+      digitalWrite(Relay_4,LOW);//FAN_OUT_OFF
       //温度ディレイタイムインクリメント
       td2=600;
     }else{
       //リレー3-4 ON
-      digitalWrite(Relay_3,LOW);//Pump_OFF
-      digitalWrite(Relay_4,LOW);//FAN_OUT_OFF
+      digitalWrite(Relay_3,HIGH);//Pump_ON
+      digitalWrite(Relay_4,HIGH);//Pump_ON
+      //温度ディレイタイムディクリメント
+      td--;
     }
   }else{
     //リレー3-4 OFF
